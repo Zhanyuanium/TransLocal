@@ -1,50 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using local_translate_provider.Models;
+using local_translate_provider.Services;
+using local_translate_provider.TrayIcon;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace local_translate_provider;
 
-namespace local_translate_provider
+public partial class App : Application
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
-    public partial class App : Application
+    private MainWindow? _window;
+    private TrayIconManager? _trayIcon;
+    private AppSettings _settings = new();
+    private TranslationService? _translationService;
+    private HttpTranslationServer? _httpServer;
+
+    public static AppSettings Settings => (Current as App)!._settings;
+    public static TranslationService TranslationService => (Current as App)!._translationService!;
+    public static HttpTranslationServer HttpServer => (Current as App)!._httpServer!;
+
+    public App()
     {
-        private Window? _window;
+        InitializeComponent();
+    }
 
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
-        public App()
+    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    {
+        _settings = await SettingsService.LoadAsync();
+        _translationService = new TranslationService(_settings);
+        _httpServer = new HttpTranslationServer(_settings, _translationService);
+        _httpServer.Start();
+
+        _window = new MainWindow();
+        _trayIcon = new TrayIconManager(ShowSettings, DoExit);
+
+        if (_settings.MinimizeToTrayOnStartup)
         {
-            InitializeComponent();
+            _window.AppWindow.Hide();
         }
-
-        /// <summary>
-        /// Invoked when the application is launched.
-        /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        else
         {
-            _window = new MainWindow();
             _window.Activate();
         }
+    }
+
+    private void ShowSettings()
+    {
+        if (_window == null) return;
+        _window.AppWindow.Show();
+        _window.Activate();
+    }
+
+    private void DoExit()
+    {
+        _httpServer?.Stop();
+        _trayIcon?.Dispose();
+        Microsoft.UI.Xaml.Application.Current.Exit();
     }
 }

@@ -7,13 +7,71 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="local-translate-provider">
+    Title="Local Translate Provider">
 
-    <Window.SystemBackdrop>
-        <MicaBackdrop />
-    </Window.SystemBackdrop>
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-    <Grid>
+        <TextBlock Grid.Row="0" Text="Local Translate Provider" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
+        <StackPanel Grid.Row="1" Margin="0,0,0,12">
+            <TextBlock Text="端口"/>
+            <TextBox x:Name="PortBox" PlaceholderText="52860"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,12">
+            <CheckBox x:Name="DeepLCheck" Content="DeepL 端点" IsChecked="True" Margin="0,0,16,0"/>
+            <CheckBox x:Name="GoogleCheck" Content="Google 端点" IsChecked="True"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Margin="0,0,0,12">
+            <TextBlock Text="API Key（可选）"/>
+            <TextBox x:Name="ApiKeyBox" PlaceholderText="留空则无需认证"/>
+        </StackPanel>
+
+        <CheckBox x:Name="MinimizeTrayCheck" Grid.Row="4" Content="启动时最小化到托盘" IsChecked="True" Margin="0,0,0,12"/>
+
+        <StackPanel Grid.Row="5" Margin="0,0,0,12">
+            <TextBlock Text="翻译后端"/>
+            <ComboBox x:Name="BackendCombo" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="Phi Silica (Copilot+ PC)" Tag="PhiSilica"/>
+                <ComboBoxItem Content="Foundry Local" Tag="FoundryLocal"/>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel x:Name="FoundryPanel" Grid.Row="6" Visibility="Collapsed" Margin="0,0,0,12">
+            <TextBlock Text="Foundry Local 模型"/>
+            <TextBox x:Name="ModelAliasBox" PlaceholderText="phi-3.5-mini"/>
+            <TextBlock Text="运行策略" Margin="0,8,0,0"/>
+            <ComboBox x:Name="StrategyCombo" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="节能" Tag="PowerSaving"/>
+                <ComboBoxItem Content="高性能" Tag="HighPerformance"/>
+                <ComboBoxItem Content="手动指定设备" Tag="Manual"/>
+            </ComboBox>
+            <StackPanel x:Name="ManualDevicePanel" Visibility="Collapsed" Margin="0,8,0,0">
+                <TextBlock Text="设备"/>
+                <ComboBox x:Name="DeviceCombo" HorizontalAlignment="Stretch">
+                    <ComboBoxItem Content="CPU" Tag="CPU"/>
+                    <ComboBoxItem Content="GPU" Tag="GPU"/>
+                    <ComboBoxItem Content="NPU" Tag="NPU"/>
+                    <ComboBoxItem Content="WebGPU" Tag="WebGPU"/>
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock x:Name="StatusText" Grid.Row="7" Text="" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+        <Button Grid.Row="8" Content="保存并重启服务" Click="SaveButton_Click" HorizontalAlignment="Stretch"/>
     </Grid>
 </Window>
