@@ -7,10 +7,7 @@ using Betalgo.Ranul.OpenAI.ObjectModels.RequestModels;
 
 namespace local_translate_provider.Services;
 
-/// <summary>
-/// Translation service using Foundry Local (local LLM via WinML).
-/// Supports multiple models and execution strategies.
-/// </summary>
+/// <summary>Foundry Local 翻译服务，支持多模型与运行策略。</summary>
 public sealed class FoundryLocalTranslationService : ITranslationService
 {
     private readonly AppSettings _settings;
@@ -55,12 +52,7 @@ public sealed class FoundryLocalTranslationService : ITranslationService
     {
         try
         {
-            await FoundryLocalManager.CreateAsync(new Configuration
-            {
-                AppName = "local-translate-provider",
-                LogLevel = Microsoft.AI.Foundry.Local.LogLevel.Information
-            }, _logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance).ConfigureAwait(false);
-
+            await EnsureManagerCreatedAsync(cancellationToken).ConfigureAwait(false);
             var mgr = FoundryLocalManager.Instance;
             var catalog = await mgr.GetCatalogAsync().ConfigureAwait(false);
             var model = await catalog.GetModelAsync(_settings.FoundryModelAlias).ConfigureAwait(false);
@@ -108,12 +100,7 @@ public sealed class FoundryLocalTranslationService : ITranslationService
                 _chatClient = null;
             }
 
-            await FoundryLocalManager.CreateAsync(new Configuration
-            {
-                AppName = "local-translate-provider",
-                LogLevel = Microsoft.AI.Foundry.Local.LogLevel.Information
-            }, _logger ?? Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance).ConfigureAwait(false);
-
+            await EnsureManagerCreatedAsync(ct).ConfigureAwait(false);
             var mgr = FoundryLocalManager.Instance;
             var catalog = await mgr.GetCatalogAsync().ConfigureAwait(false);
 
@@ -181,9 +168,21 @@ public sealed class FoundryLocalTranslationService : ITranslationService
         return settings.FoundryModelAlias;
     }
 
-    /// <summary>
-    /// Call when settings change to force reload on next translate.
-    /// </summary>
+    /// <summary>CreateAsync 仅能调用一次，重复调用会抛 "already been created"，此处捕获后复用 Instance。</summary>
+    private static async Task EnsureManagerCreatedAsync(CancellationToken ct)
+    {
+        try
+        {
+            await FoundryLocalManager.CreateAsync(new Configuration
+            {
+                AppName = "local-translate-provider",
+                LogLevel = Microsoft.AI.Foundry.Local.LogLevel.Information
+            }, Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex.Message.Contains("already been created", StringComparison.OrdinalIgnoreCase)) { }
+    }
+
+    /// <summary>设置变更时调用，强制下次翻译时重新加载模型。</summary>
     public void InvalidateLoadedModel()
     {
         _loadedModel = null;
