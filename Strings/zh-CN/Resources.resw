@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Local Translate Provider</value>
+  </data>
+  <data name="NavGeneral.Content" xml:space="preserve">
+    <value>通用</value>
+  </data>
+  <data name="NavModel.Content" xml:space="preserve">
+    <value>模型</value>
+  </data>
+  <data name="NavService.Content" xml:space="preserve">
+    <value>服务</value>
+  </data>
+  <data name="NavAbout.Content" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="GeneralTitle.Text" xml:space="preserve">
+    <value>通用</value>
+  </data>
+  <data name="RunAtStartupCard.Header" xml:space="preserve">
+    <value>开机自启动</value>
+  </data>
+  <data name="MinimizeTrayCard.Header" xml:space="preserve">
+    <value>启动时最小化到托盘</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>重置为默认设置</value>
+  </data>
+  <data name="ModelTitle.Text" xml:space="preserve">
+    <value>模型</value>
+  </data>
+  <data name="StatusCard.Header" xml:space="preserve">
+    <value>当前状态</value>
+  </data>
+  <data name="BackendCard.Header" xml:space="preserve">
+    <value>翻译后端</value>
+  </data>
+  <data name="PhiSilicaItem.Content" xml:space="preserve">
+    <value>Phi Silica (Copilot+ PC)</value>
+  </data>
+  <data name="FoundryItem.Content" xml:space="preserve">
+    <value>Foundry Local</value>
+  </data>
+  <data name="FoundryModelCard.Header" xml:space="preserve">
+    <value>Foundry Local 模型</value>
+  </data>
+  <data name="ModelAliasBox.PlaceholderText" xml:space="preserve">
+    <value>phi-3.5-mini</value>
+  </data>
+  <data name="StrategyCard.Header" xml:space="preserve">
+    <value>运行策略</value>
+  </data>
+  <data name="PowerSavingItem.Content" xml:space="preserve">
+    <value>节能</value>
+  </data>
+  <data name="HighPerfItem.Content" xml:space="preserve">
+    <value>高性能</value>
+  </data>
+  <data name="ManualItem.Content" xml:space="preserve">
+    <value>手动指定设备</value>
+  </data>
+  <data name="DeviceCard.Header" xml:space="preserve">
+    <value>设备</value>
+  </data>
+  <data name="SaveButton.Content" xml:space="preserve">
+    <value>保存并重启服务</value>
+  </data>
+  <data name="ServiceTitle.Text" xml:space="preserve">
+    <value>服务</value>
+  </data>
+  <data name="PortCard.Header" xml:space="preserve">
+    <value>端口</value>
+  </data>
+  <data name="PortBox.PlaceholderText" xml:space="preserve">
+    <value>52860</value>
+  </data>
+  <data name="EndpointsExpander.Header" xml:space="preserve">
+    <value>模拟端点</value>
+  </data>
+  <data name="DeepLCheck.Content" xml:space="preserve">
+    <value>DeepL</value>
+  </data>
+  <data name="GoogleCheck.Content" xml:space="preserve">
+    <value>Google</value>
+  </data>
+  <data name="ApiKeyCard.Header" xml:space="preserve">
+    <value>API Key（可选）</value>
+  </data>
+  <data name="ApiKeyBox.PlaceholderText" xml:space="preserve">
+    <value>留空则无需认证</value>
+  </data>
+  <data name="AboutTitle.Text" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="AppName.Text" xml:space="preserve">
+    <value>Local Translate Provider</value>
+  </data>
+  <data name="AboutPlaceholder.Text" xml:space="preserve">
+    <value>（待填充）</value>
+  </data>
+  <data name="ResetDialogTitle" xml:space="preserve">
+    <value>重置设置</value>
+  </data>
+  <data name="ResetDialogContent" xml:space="preserve">
+    <value>确定要将所有设置恢复为默认值吗？</value>
+  </data>
+  <data name="ResetDialogConfirm" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="ResetDialogCancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="StatusPrefix" xml:space="preserve">
+    <value>状态: </value>
+  </data>
+  <data name="InvalidPort" xml:space="preserve">
+    <value>端口无效</value>
+  </data>
+  <data name="SavedMessage" xml:space="preserve">
+    <value>已保存。服务运行于 http://localhost:{0}</value>
+  </data>
+  <data name="TrayToolTip" xml:space="preserve">
+    <value>Local Translate Provider</value>
+  </data>
+  <data name="TrayShowSettings" xml:space="preserve">
+    <value>显示设置</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+</root>

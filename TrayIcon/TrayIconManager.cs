@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel.Resources;
 
 namespace local_translate_provider.TrayIcon;
 
@@ -9,6 +10,8 @@ namespace local_translate_provider.TrayIcon;
 /// </summary>
 public sealed class TrayIconManager : IDisposable
 {
+    private static readonly ResourceLoader ResLoader = ResourceLoader.GetForViewIndependentUse();
+
     private readonly TaskbarIcon _taskbarIcon;
     private readonly Action _onDoubleClick;
     private readonly Action _onExit;
@@ -20,7 +23,7 @@ public sealed class TrayIconManager : IDisposable
 
         _taskbarIcon = new TaskbarIcon
         {
-            ToolTipText = "Local Translate Provider",
+            ToolTipText = ResLoader.GetString("TrayToolTip"),
             DoubleClickCommand = new RelayCommand(_ => _onDoubleClick()),
             ContextFlyout = CreateContextMenu(),
             IconSource = new GeneratedIconSource { Text = "译", Size = 16 }
@@ -34,12 +37,12 @@ public sealed class TrayIconManager : IDisposable
         var menu = new MenuFlyout();
         menu.Items.Add(new MenuFlyoutItem
         {
-            Text = "显示设置",
+            Text = ResLoader.GetString("TrayShowSettings"),
             Command = new RelayCommand(_ => _onDoubleClick())
         });
         menu.Items.Add(new MenuFlyoutItem
         {
-            Text = "退出",
+            Text = ResLoader.GetString("TrayExit"),
             Command = new RelayCommand(_ => _onExit())
         });
         return menu;

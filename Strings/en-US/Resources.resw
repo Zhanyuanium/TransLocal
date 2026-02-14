@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Local Translate Provider</value>
+  </data>
+  <data name="NavGeneral.Content" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="NavModel.Content" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="NavService.Content" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="NavAbout.Content" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="GeneralTitle.Text" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="RunAtStartupCard.Header" xml:space="preserve">
+    <value>Run at startup</value>
+  </data>
+  <data name="MinimizeTrayCard.Header" xml:space="preserve">
+    <value>Minimize to tray on startup</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>Reset to default settings</value>
+  </data>
+  <data name="ModelTitle.Text" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="StatusCard.Header" xml:space="preserve">
+    <value>Current status</value>
+  </data>
+  <data name="BackendCard.Header" xml:space="preserve">
+    <value>Translation backend</value>
+  </data>
+  <data name="PhiSilicaItem.Content" xml:space="preserve">
+    <value>Phi Silica (Copilot+ PC)</value>
+  </data>
+  <data name="FoundryItem.Content" xml:space="preserve">
+    <value>Foundry Local</value>
+  </data>
+  <data name="FoundryModelCard.Header" xml:space="preserve">
+    <value>Foundry Local model</value>
+  </data>
+  <data name="ModelAliasBox.PlaceholderText" xml:space="preserve">
+    <value>phi-3.5-mini</value>
+  </data>
+  <data name="StrategyCard.Header" xml:space="preserve">
+    <value>Execution strategy</value>
+  </data>
+  <data name="PowerSavingItem.Content" xml:space="preserve">
+    <value>Power saving</value>
+  </data>
+  <data name="HighPerfItem.Content" xml:space="preserve">
+    <value>High performance</value>
+  </data>
+  <data name="ManualItem.Content" xml:space="preserve">
+    <value>Manual device</value>
+  </data>
+  <data name="DeviceCard.Header" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="SaveButton.Content" xml:space="preserve">
+    <value>Save and restart service</value>
+  </data>
+  <data name="ServiceTitle.Text" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="PortCard.Header" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="PortBox.PlaceholderText" xml:space="preserve">
+    <value>52860</value>
+  </data>
+  <data name="EndpointsExpander.Header" xml:space="preserve">
+    <value>Simulated endpoints</value>
+  </data>
+  <data name="DeepLCheck.Content" xml:space="preserve">
+    <value>DeepL</value>
+  </data>
+  <data name="GoogleCheck.Content" xml:space="preserve">
+    <value>Google</value>
+  </data>
+  <data name="ApiKeyCard.Header" xml:space="preserve">
+    <value>API Key (optional)</value>
+  </data>
+  <data name="ApiKeyBox.PlaceholderText" xml:space="preserve">
+    <value>Leave empty for no authentication</value>
+  </data>
+  <data name="AboutTitle.Text" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AppName.Text" xml:space="preserve">
+    <value>Local Translate Provider</value>
+  </data>
+  <data name="AboutPlaceholder.Text" xml:space="preserve">
+    <value>(To be filled)</value>
+  </data>
+  <data name="ResetDialogTitle" xml:space="preserve">
+    <value>Reset settings</value>
+  </data>
+  <data name="ResetDialogContent" xml:space="preserve">
+    <value>Are you sure you want to restore all settings to their default values?</value>
+  </data>
+  <data name="ResetDialogConfirm" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="ResetDialogCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="StatusPrefix" xml:space="preserve">
+    <value>Status: </value>
+  </data>
+  <data name="InvalidPort" xml:space="preserve">
+    <value>Invalid port</value>
+  </data>
+  <data name="SavedMessage" xml:space="preserve">
+    <value>Saved. Service running at http://localhost:{0}</value>
+  </data>
+  <data name="TrayToolTip" xml:space="preserve">
+    <value>Local Translate Provider</value>
+  </data>
+  <data name="TrayShowSettings" xml:space="preserve">
+    <value>Show settings</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+</root>

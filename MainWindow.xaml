@@ -17,22 +17,22 @@
         IsSettingsVisible="False"
         SelectionChanged="NavView_SelectionChanged">
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="通用" Tag="General">
+            <NavigationViewItem x:Uid="NavGeneral" Content="General" Tag="General">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Setting"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="模型" Tag="Model">
+            <NavigationViewItem x:Uid="NavModel" Content="Model" Tag="Model">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="ShowResults"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="服务" Tag="Service">
+            <NavigationViewItem x:Uid="NavService" Content="Service" Tag="Service">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Globe"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="关于" Tag="About">
+            <NavigationViewItem x:Uid="NavAbout" Content="About" Tag="About">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Help"/>
                 </NavigationViewItem.Icon>
@@ -49,40 +49,40 @@
                 <Grid MaxWidth="1000" HorizontalAlignment="Stretch" Padding="20,0">
                     <!-- 通用 -->
                     <StackPanel x:Name="GeneralPanel" Visibility="Collapsed" Spacing="8" HorizontalAlignment="Stretch">
-                    <TextBlock x:Name="GeneralTitle" Text="通用" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
-                    <toolkit:SettingsCard Header="开机自启动" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="GeneralTitle" x:Uid="GeneralTitle" Text="General" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                    <toolkit:SettingsCard x:Uid="RunAtStartupCard" Header="Run at startup" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                         <ToggleSwitch x:Name="RunAtStartupSwitch" VerticalAlignment="Center"/>
                     </toolkit:SettingsCard>
-                    <toolkit:SettingsCard Header="启动时最小化到托盘" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                    <toolkit:SettingsCard x:Uid="MinimizeTrayCard" Header="Minimize to tray" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                         <ToggleSwitch x:Name="MinimizeTraySwitch" VerticalAlignment="Center"/>
                     </toolkit:SettingsCard>
-                    <Button Content="重置为默认设置" Click="ResetSettings_Click" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+                    <Button x:Uid="ResetButton" Content="Reset to default" Click="ResetSettings_Click" HorizontalAlignment="Left" Margin="0,8,0,0"/>
                     </StackPanel>
 
                     <!-- 模型 -->
                     <StackPanel x:Name="ModelPanel" Visibility="Collapsed" Spacing="8" HorizontalAlignment="Stretch">
-                    <TextBlock x:Name="ModelTitle" Text="模型" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
-                    <toolkit:SettingsCard Header="当前状态" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="ModelTitle" x:Uid="ModelTitle" Text="Model" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                    <toolkit:SettingsCard x:Uid="StatusCard" Header="Current status" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                         <TextBlock x:Name="StatusText" Text="" TextWrapping="Wrap"/>
                     </toolkit:SettingsCard>
-                    <toolkit:SettingsCard Header="翻译后端" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                    <toolkit:SettingsCard x:Uid="BackendCard" Header="Translation backend" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                         <ComboBox x:Name="BackendCombo" MinWidth="180" VerticalAlignment="Center">
-                            <ComboBoxItem Content="Phi Silica (Copilot+ PC)" Tag="PhiSilica"/>
-                            <ComboBoxItem Content="Foundry Local" Tag="FoundryLocal"/>
+                            <ComboBoxItem x:Uid="PhiSilicaItem" Content="Phi Silica (Copilot+ PC)" Tag="PhiSilica"/>
+                            <ComboBoxItem x:Uid="FoundryItem" Content="Foundry Local" Tag="FoundryLocal"/>
                         </ComboBox>
                     </toolkit:SettingsCard>
                     <StackPanel x:Name="FoundryPanel" Visibility="Collapsed" Spacing="8">
-                        <toolkit:SettingsCard Header="Foundry Local 模型" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
-                            <TextBox x:Name="ModelAliasBox" PlaceholderText="phi-3.5-mini" MinWidth="180" VerticalAlignment="Center"/>
+                        <toolkit:SettingsCard x:Uid="FoundryModelCard" Header="Foundry Local model" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                            <TextBox x:Name="ModelAliasBox" x:Uid="ModelAliasBox" PlaceholderText="phi-3.5-mini" MinWidth="180" VerticalAlignment="Center"/>
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard Header="运行策略" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <toolkit:SettingsCard x:Uid="StrategyCard" Header="Execution strategy" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                             <ComboBox x:Name="StrategyCombo" MinWidth="180" VerticalAlignment="Center">
-                                <ComboBoxItem Content="节能" Tag="PowerSaving"/>
-                                <ComboBoxItem Content="高性能" Tag="HighPerformance"/>
-                                <ComboBoxItem Content="手动指定设备" Tag="Manual"/>
+                                <ComboBoxItem x:Uid="PowerSavingItem" Content="Power saving" Tag="PowerSaving"/>
+                                <ComboBoxItem x:Uid="HighPerfItem" Content="High performance" Tag="HighPerformance"/>
+                                <ComboBoxItem x:Uid="ManualItem" Content="Manual device" Tag="Manual"/>
                             </ComboBox>
                         </toolkit:SettingsCard>
-                        <toolkit:SettingsCard x:Name="ManualDeviceBorder" Visibility="Collapsed" Header="设备" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <toolkit:SettingsCard x:Name="ManualDeviceBorder" x:Uid="DeviceCard" Visibility="Collapsed" Header="Device" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                             <ComboBox x:Name="DeviceCombo" MinWidth="180" VerticalAlignment="Center">
                                 <ComboBoxItem Content="CPU" Tag="CPU"/>
                                 <ComboBoxItem Content="GPU" Tag="GPU"/>
@@ -91,35 +91,35 @@
                             </ComboBox>
                         </toolkit:SettingsCard>
                     </StackPanel>
-                    <Button x:Name="SaveButton" Content="保存并重启服务" Click="SaveButton_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+                    <Button x:Name="SaveButton" x:Uid="SaveButton" Content="Save and restart" Click="SaveButton_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
                     </StackPanel>
 
                     <!-- 服务 -->
                     <StackPanel x:Name="ServicePanel" Visibility="Collapsed" Spacing="8" HorizontalAlignment="Stretch">
-                    <TextBlock x:Name="ServiceTitle" Text="服务" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
-                    <toolkit:SettingsCard Header="端口" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
-                        <TextBox x:Name="PortBox" PlaceholderText="52860" MinWidth="120" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="ServiceTitle" x:Uid="ServiceTitle" Text="Service" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                    <toolkit:SettingsCard x:Uid="PortCard" Header="Port" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <TextBox x:Name="PortBox" x:Uid="PortBox" PlaceholderText="52860" MinWidth="120" VerticalAlignment="Center"/>
                     </toolkit:SettingsCard>
-                    <toolkit:SettingsExpander Header="模拟端点" HorizontalAlignment="Stretch">
+                    <toolkit:SettingsExpander x:Uid="EndpointsExpander" Header="Simulated endpoints" HorizontalAlignment="Stretch">
                         <toolkit:SettingsExpander.Items>
                             <toolkit:SettingsCard ContentAlignment="Left" IsClickEnabled="False" IsActionIconVisible="False">
-                                <CheckBox x:Name="DeepLCheck" Content="DeepL" IsChecked="True"/>
+                                <CheckBox x:Name="DeepLCheck" x:Uid="DeepLCheck" Content="DeepL" IsChecked="True"/>
                             </toolkit:SettingsCard>
                             <toolkit:SettingsCard ContentAlignment="Left" IsClickEnabled="False" IsActionIconVisible="False">
-                                <CheckBox x:Name="GoogleCheck" Content="Google" IsChecked="True"/>
+                                <CheckBox x:Name="GoogleCheck" x:Uid="GoogleCheck" Content="Google" IsChecked="True"/>
                             </toolkit:SettingsCard>
                         </toolkit:SettingsExpander.Items>
                     </toolkit:SettingsExpander>
-                    <toolkit:SettingsCard Header="API Key（可选）" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
-                        <TextBox x:Name="ApiKeyBox" PlaceholderText="留空则无需认证" MinWidth="180" VerticalAlignment="Center"/>
+                    <toolkit:SettingsCard x:Uid="ApiKeyCard" Header="API Key (optional)" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <TextBox x:Name="ApiKeyBox" x:Uid="ApiKeyBox" PlaceholderText="Leave empty" MinWidth="180" VerticalAlignment="Center"/>
                     </toolkit:SettingsCard>
                     </StackPanel>
 
                     <!-- 关于 -->
                     <StackPanel x:Name="AboutPanel" Visibility="Collapsed" Spacing="12" HorizontalAlignment="Stretch">
-                    <TextBlock x:Name="AboutTitle" Text="关于" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
-                    <TextBlock Text="Local Translate Provider" FontSize="18" FontWeight="SemiBold"/>
-                    <TextBlock Text="（待填充）" Opacity="0.6"/>
+                    <TextBlock x:Name="AboutTitle" x:Uid="AboutTitle" Text="About" FontSize="28" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                    <TextBlock x:Uid="AppName" Text="Local Translate Provider" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock x:Uid="AboutPlaceholder" Text="(To be filled)" Opacity="0.6"/>
                     </StackPanel>
                 </Grid>
             </Grid>

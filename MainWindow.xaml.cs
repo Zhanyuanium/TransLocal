@@ -4,15 +4,19 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Windows.ApplicationModel.Resources;
 using Windows.Graphics;
 
 namespace local_translate_provider;
 
 public sealed partial class MainWindow : Window
 {
+    private static readonly ResourceLoader ResLoader = ResourceLoader.GetForViewIndependentUse();
+
     public MainWindow()
     {
         InitializeComponent();
+        Title = ResLoader.GetString("WindowTitle");
         SystemBackdrop = new MicaBackdrop();
         AppWindow.Resize(new SizeInt32(1700, 1200));
         LoadSettings();
@@ -120,13 +124,15 @@ public sealed partial class MainWindow : Window
         try
         {
             var status = await App.TranslationService.GetStatusAsync();
-            StatusText.Text = status.IsReady ? $"状态: {status.Message}" : $"状态: {status.Message}";
+            var prefix = ResLoader.GetString("StatusPrefix");
+            StatusText.Text = $"{prefix}{status.Message}";
             if (!string.IsNullOrEmpty(status.Detail))
                 StatusText.Text += $"\n{status.Detail}";
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"状态: {ex.Message}";
+            var prefix = ResLoader.GetString("StatusPrefix");
+            StatusText.Text = $"{prefix}{ex.Message}";
         }
     }
 
@@ -134,10 +140,10 @@ public sealed partial class MainWindow : Window
     {
         var dialog = new ContentDialog
         {
-            Title = "重置设置",
-            Content = "确定要将所有设置恢复为默认值吗？",
-            PrimaryButtonText = "确定",
-            CloseButtonText = "取消",
+            Title = ResLoader.GetString("ResetDialogTitle"),
+            Content = ResLoader.GetString("ResetDialogContent"),
+            PrimaryButtonText = ResLoader.GetString("ResetDialogConfirm"),
+            CloseButtonText = ResLoader.GetString("ResetDialogCancel"),
             XamlRoot = NavView.XamlRoot
         };
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)
@@ -163,7 +169,7 @@ public sealed partial class MainWindow : Window
     {
         if (!int.TryParse(PortBox.Text, out var port) || port < 1 || port > 65535)
         {
-            StatusText.Text = "端口无效";
+            StatusText.Text = ResLoader.GetString("InvalidPort");
             return;
         }
 
@@ -193,7 +199,7 @@ public sealed partial class MainWindow : Window
         await SettingsService.SaveAsync(s);
         App.TranslationService.UpdateSettings(s);
         App.HttpServer.Restart();
-        StatusText.Text = $"已保存。服务运行于 http://localhost:{s.Port}";
+        StatusText.Text = string.Format(ResLoader.GetString("SavedMessage"), s.Port);
         await RefreshStatusAsync();
     }
 }
