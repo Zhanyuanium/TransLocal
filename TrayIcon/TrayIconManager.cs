@@ -32,14 +32,16 @@ public sealed class TrayIconManager : IDisposable
     private MenuFlyout CreateContextMenu()
     {
         var menu = new MenuFlyout();
-        var showItem = new MenuFlyoutItem { Text = "显示设置" };
-        showItem.Click += (_, _) => _onDoubleClick();
-        menu.Items.Add(showItem);
-
-        var exitItem = new MenuFlyoutItem { Text = "退出" };
-        exitItem.Click += (_, _) => _onExit();
-        menu.Items.Add(exitItem);
-
+        menu.Items.Add(new MenuFlyoutItem
+        {
+            Text = "显示设置",
+            Command = new RelayCommand(_ => _onDoubleClick())
+        });
+        menu.Items.Add(new MenuFlyoutItem
+        {
+            Text = "退出",
+            Command = new RelayCommand(_ => _onExit())
+        });
         return menu;
     }
 
