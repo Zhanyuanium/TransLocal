@@ -13,9 +13,11 @@ public sealed partial class MainWindow : Window
 {
     private const double CollapseThreshold = 830;
     private static readonly ResourceLoader ResLoader = ResourceLoader.GetForViewIndependentUse();
+    private readonly Action? _onClosing;
 
-    public MainWindow()
+    public MainWindow(Action? onClosing = null)
     {
+        _onClosing = onClosing;
         InitializeComponent();
         Title = ResLoader.GetString("WindowTitle");
         SystemBackdrop = new MicaBackdrop();
@@ -29,11 +31,21 @@ public sealed partial class MainWindow : Window
         UpdatePageTitle("General");
         NavigateTo("General");
         UpdatePaneDisplayMode();
-        AppWindow.Closing += (_, args) =>
-        {
-            args.Cancel = true;
-            AppWindow.Hide();
-        };
+        AppWindow.Closing += OnAppWindowClosing;
+    }
+
+    private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        // 清空导航栈和内容，断开对页面的引用，便于 GC 回收
+        ContentFrame.BackStack.Clear();
+        ContentFrame.Content = null;
+        // 解除事件订阅，避免闭包持有窗口引用
+        AppWindow.Closing -= OnAppWindowClosing;
+        NavView.SelectionChanged -= NavView_SelectionChanged;
+        NavView.Loaded -= NavView_Loaded;
+        NavView.SizeChanged -= NavView_SizeChanged;
+        _onClosing?.Invoke();
+        // 不取消关闭，允许窗口销毁，使应用回归仅托盘运行的开销
     }
 
     private string _currentTag = "General";
