@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="local_translate_provider.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer
+        Background="Transparent"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
+        <Grid Margin="0,0" HorizontalAlignment="Stretch">
+            <Grid MaxWidth="1000" HorizontalAlignment="Stretch" Padding="20,0">
+                <!-- 通用 -->
+                <StackPanel x:Name="GeneralPanel" Visibility="Collapsed" Spacing="8" HorizontalAlignment="Stretch">
+                    <toolkit:SettingsCard x:Uid="RunAtStartupCard" Header="Run at startup" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <ToggleSwitch x:Name="RunAtStartupSwitch" VerticalAlignment="Center"/>
+                    </toolkit:SettingsCard>
+                    <toolkit:SettingsCard x:Uid="MinimizeTrayCard" Header="Minimize to tray" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <ToggleSwitch x:Name="MinimizeTraySwitch" VerticalAlignment="Center"/>
+                    </toolkit:SettingsCard>
+                    <Button x:Uid="ResetButton" Content="Reset to default" Click="ResetSettings_Click" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+                </StackPanel>
+
+                <!-- 模型 -->
+                <StackPanel x:Name="ModelPanel" Visibility="Collapsed" Spacing="8" HorizontalAlignment="Stretch">
+                    <toolkit:SettingsCard x:Uid="StatusCard" Header="Current status" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <TextBlock x:Name="StatusText" Text="" TextWrapping="Wrap"/>
+                    </toolkit:SettingsCard>
+                    <toolkit:SettingsCard x:Uid="BackendCard" Header="Translation backend" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <ComboBox x:Name="BackendCombo" MinWidth="180" VerticalAlignment="Center">
+                            <ComboBoxItem x:Uid="PhiSilicaItem" Content="Phi Silica (Copilot+ PC)" Tag="PhiSilica"/>
+                            <ComboBoxItem x:Uid="FoundryItem" Content="Foundry Local" Tag="FoundryLocal"/>
+                        </ComboBox>
+                    </toolkit:SettingsCard>
+                    <StackPanel x:Name="FoundryPanel" Visibility="Collapsed" Spacing="8">
+                        <toolkit:SettingsCard x:Uid="FoundryModelCard" Header="Foundry Local model" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                            <TextBox x:Name="ModelAliasBox" x:Uid="ModelAliasBox" PlaceholderText="phi-3.5-mini" MinWidth="180" VerticalAlignment="Center"/>
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard x:Uid="StrategyCard" Header="Execution strategy" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                            <ComboBox x:Name="StrategyCombo" MinWidth="180" VerticalAlignment="Center">
+                                <ComboBoxItem x:Uid="PowerSavingItem" Content="Power saving" Tag="PowerSaving"/>
+                                <ComboBoxItem x:Uid="HighPerfItem" Content="High performance" Tag="HighPerformance"/>
+                                <ComboBoxItem x:Uid="ManualItem" Content="Manual device" Tag="Manual"/>
+                            </ComboBox>
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard x:Name="ManualDeviceBorder" x:Uid="DeviceCard" Visibility="Collapsed" Header="Device" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                            <ComboBox x:Name="DeviceCombo" MinWidth="180" VerticalAlignment="Center">
+                                <ComboBoxItem Content="CPU" Tag="CPU"/>
+                                <ComboBoxItem Content="GPU" Tag="GPU"/>
+                                <ComboBoxItem Content="NPU" Tag="NPU"/>
+                                <ComboBoxItem Content="WebGPU" Tag="WebGPU"/>
+                            </ComboBox>
+                        </toolkit:SettingsCard>
+                    </StackPanel>
+                    <Button x:Name="SaveButton" x:Uid="SaveButton" Content="Save and restart" Click="SaveButton_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>
+                </StackPanel>
+
+                <!-- 服务 -->
+                <StackPanel x:Name="ServicePanel" Visibility="Collapsed" Spacing="8" HorizontalAlignment="Stretch">
+                    <toolkit:SettingsCard x:Uid="PortCard" Header="Port" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <TextBox x:Name="PortBox" x:Uid="PortBox" PlaceholderText="52860" MinWidth="120" VerticalAlignment="Center"/>
+                    </toolkit:SettingsCard>
+                    <toolkit:SettingsExpander x:Uid="EndpointsExpander" Header="Simulated endpoints" HorizontalAlignment="Stretch">
+                        <toolkit:SettingsExpander.Items>
+                            <toolkit:SettingsCard ContentAlignment="Left" IsClickEnabled="False" IsActionIconVisible="False">
+                                <CheckBox x:Name="DeepLCheck" x:Uid="DeepLCheck" Content="DeepL" IsChecked="True"/>
+                            </toolkit:SettingsCard>
+                            <toolkit:SettingsCard ContentAlignment="Left" IsClickEnabled="False" IsActionIconVisible="False">
+                                <CheckBox x:Name="GoogleCheck" x:Uid="GoogleCheck" Content="Google" IsChecked="True"/>
+                            </toolkit:SettingsCard>
+                        </toolkit:SettingsExpander.Items>
+                    </toolkit:SettingsExpander>
+                    <toolkit:SettingsCard x:Uid="ApiKeyCard" Header="API Key (optional)" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <TextBox x:Name="ApiKeyBox" x:Uid="ApiKeyBox" PlaceholderText="Leave empty" MinWidth="180" VerticalAlignment="Center"/>
+                    </toolkit:SettingsCard>
+                </StackPanel>
+
+                <!-- 关于 -->
+                <StackPanel x:Name="AboutPanel" Visibility="Collapsed" Spacing="12" HorizontalAlignment="Stretch">
+                    <TextBlock x:Uid="AppName" Text="Local Translate Provider" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock x:Uid="AboutPlaceholder" Text="(To be filled)" Opacity="0.6"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

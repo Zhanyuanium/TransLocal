@@ -1,9 +1,9 @@
-using local_translate_provider.Models;
-using local_translate_provider.Services;
+using local_translate_provider.Pages;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Windows.ApplicationModel.Resources;
 using Windows.Graphics;
 
@@ -11,6 +11,7 @@ namespace local_translate_provider;
 
 public sealed partial class MainWindow : Window
 {
+    private const double CollapseThreshold = 830;
     private static readonly ResourceLoader ResLoader = ResourceLoader.GetForViewIndependentUse();
 
     public MainWindow()
@@ -19,11 +20,15 @@ public sealed partial class MainWindow : Window
         Title = ResLoader.GetString("WindowTitle");
         SystemBackdrop = new MicaBackdrop();
         AppWindow.Resize(new SizeInt32(1700, 1200));
-        LoadSettings();
-        BackendCombo.SelectionChanged += (_, _) => UpdateBackendVisibility();
-        StrategyCombo.SelectionChanged += (_, _) => UpdateStrategyVisibility();
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.PreferredMinimumWidth = 350;
+            presenter.PreferredMinimumHeight = 320;
+        }
         NavView.SelectedItem = NavView.MenuItems[0];
-        ShowPanel("General");
+        UpdatePageTitle("General");
+        NavigateTo("General");
+        UpdatePaneDisplayMode();
         AppWindow.Closing += (_, args) =>
         {
             args.Cancel = true;
@@ -31,175 +36,65 @@ public sealed partial class MainWindow : Window
         };
     }
 
+    private string _currentTag = "General";
+
+    private void NavView_Loaded(object sender, RoutedEventArgs e)
+    {
+        UpdatePaneDisplayMode();
+    }
+
+    private void NavView_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdatePaneDisplayMode();
+    }
+
+    private void UpdatePaneDisplayMode()
+    {
+        var width = NavView.ActualWidth;
+        var isMinimal = width < CollapseThreshold;
+        NavView.PaneDisplayMode = isMinimal
+            ? NavigationViewPaneDisplayMode.LeftMinimal
+            : NavigationViewPaneDisplayMode.Left;
+        // 折叠时左侧留出汉堡按钮宽度，避免标题重叠
+        ContentGrid.Margin = isMinimal ? new Thickness(48, 0, 0, 0) : new Thickness(0, 0, 0, 0);
+    }
+
+    private void UpdatePageTitle(string tag)
+    {
+        var key = tag switch
+        {
+            "General" => "GeneralTitle/Text",
+            "Model" => "ModelTitle/Text",
+            "Service" => "ServiceTitle/Text",
+            "About" => "AboutTitle/Text",
+            _ => "GeneralTitle/Text"
+        };
+        PageTitle.Text = ResLoader.GetString(key);
+    }
+
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (args.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+        if (args.SelectedItem is NavigationViewItem item && item.Tag is string tag && tag != _currentTag)
         {
-            SaveCurrentPanelBeforeLeave();
-            ShowPanel(tag);
+            _currentTag = tag;
+            UpdatePageTitle(tag);
+            _ = SaveCurrentAndNavigateAsync(tag);
         }
     }
 
-    private async void SaveCurrentPanelBeforeLeave()
+    private async System.Threading.Tasks.Task SaveCurrentAndNavigateAsync(string newTag)
     {
-        if (GeneralPanel.Visibility == Visibility.Visible)
-            await SaveGeneralAsync();
-        else if (ServicePanel.Visibility == Visibility.Visible)
-            await SaveServiceAsync();
+        if (ContentFrame.Content is SettingsPage page)
+            await page.SaveBeforeLeaveAsync();
+        NavigateTo(newTag);
     }
 
-    private async System.Threading.Tasks.Task SaveGeneralAsync()
+    private void NavigateTo(string tag)
     {
-        var s = App.Settings;
-        s.RunAtStartup = RunAtStartupSwitch.IsOn;
-        s.MinimizeToTrayOnStartup = MinimizeTraySwitch.IsOn;
-        await SettingsService.SaveAsync(s);
-    }
-
-    private async System.Threading.Tasks.Task SaveServiceAsync()
-    {
-        if (!int.TryParse(PortBox.Text, out var port) || port < 1 || port > 65535)
-            return;
-        var s = App.Settings;
-        s.Port = port;
-        s.EnableDeepLEndpoint = DeepLCheck.IsChecked == true;
-        s.EnableGoogleEndpoint = GoogleCheck.IsChecked == true;
-        s.ApiKey = string.IsNullOrWhiteSpace(ApiKeyBox.Text) ? null : ApiKeyBox.Text.Trim();
-        await SettingsService.SaveAsync(s);
-        App.HttpServer.Restart();
-    }
-
-    private void ShowPanel(string tag)
-    {
-        GeneralPanel.Visibility = tag == "General" ? Visibility.Visible : Visibility.Collapsed;
-        ModelPanel.Visibility = tag == "Model" ? Visibility.Visible : Visibility.Collapsed;
-        ServicePanel.Visibility = tag == "Service" ? Visibility.Visible : Visibility.Collapsed;
-        AboutPanel.Visibility = tag == "About" ? Visibility.Visible : Visibility.Collapsed;
-        SaveButton.Visibility = tag == "Model" ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private void LoadSettings()
-    {
-        var s = App.Settings;
-        RunAtStartupSwitch.IsOn = s.RunAtStartup;
-        MinimizeTraySwitch.IsOn = s.MinimizeToTrayOnStartup;
-        PortBox.Text = s.Port.ToString();
-        DeepLCheck.IsChecked = s.EnableDeepLEndpoint;
-        GoogleCheck.IsChecked = s.EnableGoogleEndpoint;
-        ApiKeyBox.Text = s.ApiKey ?? "";
-        BackendCombo.SelectedIndex = s.TranslationBackend == TranslationBackend.PhiSilica ? 0 : 1;
-        ModelAliasBox.Text = s.FoundryModelAlias;
-        StrategyCombo.SelectedIndex = s.ExecutionStrategy switch
+        var transition = new SlideNavigationTransitionInfo
         {
-            FoundryExecutionStrategy.PowerSaving => 0,
-            FoundryExecutionStrategy.HighPerformance => 1,
-            _ => 2
+            Effect = SlideNavigationTransitionEffect.FromBottom
         };
-        DeviceCombo.SelectedIndex = s.ManualDeviceType switch
-        {
-            FoundryDeviceType.CPU => 0,
-            FoundryDeviceType.GPU => 1,
-            FoundryDeviceType.NPU => 2,
-            _ => 3
-        };
-        UpdateBackendVisibility();
-        UpdateStrategyVisibility();
-        _ = RefreshStatusAsync();
-    }
-
-    private void UpdateBackendVisibility()
-    {
-        var isFoundry = BackendCombo.SelectedIndex == 1;
-        FoundryPanel.Visibility = isFoundry ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private void UpdateStrategyVisibility()
-    {
-        var isManual = StrategyCombo.SelectedIndex == 2;
-        ManualDeviceBorder.Visibility = isManual ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private async System.Threading.Tasks.Task RefreshStatusAsync()
-    {
-        try
-        {
-            var status = await App.TranslationService.GetStatusAsync();
-            var prefix = ResLoader.GetString("StatusPrefix");
-            StatusText.Text = $"{prefix}{status.Message}";
-            if (!string.IsNullOrEmpty(status.Detail))
-                StatusText.Text += $"\n{status.Detail}";
-        }
-        catch (Exception ex)
-        {
-            var prefix = ResLoader.GetString("StatusPrefix");
-            StatusText.Text = $"{prefix}{ex.Message}";
-        }
-    }
-
-    private async void ResetSettings_Click(object sender, RoutedEventArgs e)
-    {
-        var dialog = new ContentDialog
-        {
-            Title = ResLoader.GetString("ResetDialogTitle"),
-            Content = ResLoader.GetString("ResetDialogContent"),
-            PrimaryButtonText = ResLoader.GetString("ResetDialogConfirm"),
-            CloseButtonText = ResLoader.GetString("ResetDialogCancel"),
-            XamlRoot = NavView.XamlRoot
-        };
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-        {
-            App.Settings.Port = 52860;
-            App.Settings.EnableDeepLEndpoint = true;
-            App.Settings.EnableGoogleEndpoint = true;
-            App.Settings.ApiKey = null;
-            App.Settings.RunAtStartup = false;
-            App.Settings.MinimizeToTrayOnStartup = true;
-            App.Settings.TranslationBackend = TranslationBackend.FoundryLocal;
-            App.Settings.FoundryModelAlias = "phi-3.5-mini";
-            App.Settings.ExecutionStrategy = FoundryExecutionStrategy.HighPerformance;
-            App.Settings.ManualDeviceType = FoundryDeviceType.CPU;
-            await SettingsService.SaveAsync(App.Settings);
-            LoadSettings();
-            App.TranslationService.UpdateSettings(App.Settings);
-            App.HttpServer.Restart();
-        }
-    }
-
-    private async void SaveButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (!int.TryParse(PortBox.Text, out var port) || port < 1 || port > 65535)
-        {
-            StatusText.Text = ResLoader.GetString("InvalidPort");
-            return;
-        }
-
-        var s = App.Settings;
-        s.RunAtStartup = RunAtStartupSwitch.IsOn;
-        s.MinimizeToTrayOnStartup = MinimizeTraySwitch.IsOn;
-        s.Port = port;
-        s.EnableDeepLEndpoint = DeepLCheck.IsChecked == true;
-        s.EnableGoogleEndpoint = GoogleCheck.IsChecked == true;
-        s.ApiKey = string.IsNullOrWhiteSpace(ApiKeyBox.Text) ? null : ApiKeyBox.Text.Trim();
-        s.TranslationBackend = BackendCombo.SelectedIndex == 0 ? TranslationBackend.PhiSilica : TranslationBackend.FoundryLocal;
-        s.FoundryModelAlias = ModelAliasBox.Text.Trim();
-        s.ExecutionStrategy = StrategyCombo.SelectedIndex switch
-        {
-            0 => FoundryExecutionStrategy.PowerSaving,
-            1 => FoundryExecutionStrategy.HighPerformance,
-            _ => FoundryExecutionStrategy.Manual
-        };
-        s.ManualDeviceType = DeviceCombo.SelectedIndex switch
-        {
-            0 => FoundryDeviceType.CPU,
-            1 => FoundryDeviceType.GPU,
-            2 => FoundryDeviceType.NPU,
-            _ => FoundryDeviceType.WebGPU
-        };
-
-        await SettingsService.SaveAsync(s);
-        App.TranslationService.UpdateSettings(s);
-        App.HttpServer.Restart();
-        StatusText.Text = string.Format(ResLoader.GetString("SavedMessage"), s.Port);
-        await RefreshStatusAsync();
+        ContentFrame.Navigate(typeof(SettingsPage), tag, transition);
     }
 }
