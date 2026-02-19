@@ -4,7 +4,9 @@ using local_translate_provider.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.Storage.Pickers;
 using Windows.ApplicationModel.Resources;
+using Windows.System;
 
 namespace local_translate_provider.Pages;
 
@@ -58,6 +60,11 @@ public sealed partial class SettingsPage : Page
         App.HttpServer.Restart();
     }
 
+    private async void OpenProxySettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        await Launcher.LaunchUriAsync(new Uri("ms-settings:network-proxy"));
+    }
+
     private void ShowPanel(string tag)
     {
         GeneralPanel.Visibility = tag == "General" ? Visibility.Visible : Visibility.Collapsed;
@@ -73,6 +80,7 @@ public sealed partial class SettingsPage : Page
         RunAtStartupSwitch.IsOn = s.RunAtStartup;
         MinimizeTraySwitch.IsOn = s.MinimizeToTrayOnStartup;
         PortBox.Text = s.Port.ToString();
+        ApiProxyHintText.Text = string.Format(ResLoader.GetString("ApiProxyHintFormat"), s.Port);
         DeepLCheck.IsChecked = s.EnableDeepLEndpoint;
         GoogleCheck.IsChecked = s.EnableGoogleEndpoint;
         ApiKeyBox.Text = s.ApiKey ?? "";
@@ -95,6 +103,49 @@ public sealed partial class SettingsPage : Page
         UpdateStrategyVisibility();
         DebugLogSwitch.IsOn = s.DebugLogEnabled;
         _ = RefreshStatusAsync();
+    }
+
+    private async void ExportCertButton_Click(object sender, RoutedEventArgs e)
+    {
+        var window = App.MainWindow;
+        if (window == null) return;
+        var picker = new FileSavePicker(window.AppWindow.Id)
+        {
+            SuggestedFileName = "local-translate-provider-ca.cer",
+            FileTypeChoices = { { "Certificate", new List<string> { ".cer" } } },
+            DefaultFileExtension = ".cer"
+        };
+        var result = await picker.PickSaveFileAsync();
+        if (result != null)
+        {
+            App.CertManager.ExportCaToFile(result.Path);
+        }
+    }
+
+    private async void InstallCertButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (App.CertManager.TryInstallCaToCurrentUser())
+        {
+            var dialog = new ContentDialog
+            {
+                Title = ResLoader.GetString("InstallCertSuccessTitle"),
+                Content = ResLoader.GetString("InstallCertSuccessContent"),
+                CloseButtonText = "OK",
+                XamlRoot = XamlRoot
+            };
+            await dialog.ShowAsync();
+        }
+        else
+        {
+            var dialog = new ContentDialog
+            {
+                Title = ResLoader.GetString("InstallCertFailTitle"),
+                Content = ResLoader.GetString("InstallCertFailContent"),
+                CloseButtonText = "OK",
+                XamlRoot = XamlRoot
+            };
+            await dialog.ShowAsync();
+        }
     }
 
     private async void DebugLogSwitch_Toggled(object sender, RoutedEventArgs e)

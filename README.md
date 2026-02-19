@@ -5,6 +5,7 @@
 ## 功能特性
 
 - **HTTP 翻译接口**：兼容 DeepL 与 Google Translate 的 API 格式，便于现有翻译插件接入
+- **API 代理**：可将系统代理设为本地服务，自动拦截 `api-free.deepl.com`、`api.deepl.com`、`translate.googleapis.com` 的 HTTPS 请求并本地翻译，无需修改应用配置
 - **双后端**：
   - **Phi Silica**：基于 Windows AI，需 Copilot+ PC（NPU），中国区域不可用
   - **Foundry Local**：基于 Microsoft AI Foundry，支持 phi-3.5-mini、qwen2.5 等模型，可选用 CPU/GPU/NPU
@@ -58,6 +59,17 @@ local-translate-provider --help     显示帮助
 - `config general`：`--run-at-startup`、`--minimize-tray`
 - `config model`：`--backend`、`--model`、`--strategy`、`--device`
 - `config service`：`--port`、`--deeple`、`--google`、`--api-key`
+
+## API 代理
+
+在「服务」页点击「打开代理设置」，将系统代理手动设为 `127.0.0.1:52860` 后，浏览器或应用通过系统代理访问 DeepL/Google 翻译 API 时，请求会被拦截并转发到本地翻译服务。
+
+**使用步骤：**
+
+1. 点击「打开代理设置」，将系统代理设为 `127.0.0.1:52860`（端口与上方一致）
+2. 导出 CA 证书并安装到系统「受信任的根证书颁发机构」（或点击「安装 CA 证书」尝试自动安装）
+
+**拦截域名**：`api-free.deepl.com`、`api.deepl.com`、`translate.googleapis.com`
 
 ## HTTP 接口
 
@@ -114,7 +126,7 @@ local-translate-provider/
 ├── ApiAdapters/          # DeepL / Google API 请求解析
 ├── Models/               # AppSettings 等
 ├── Pages/                # 主窗口设置页（通用 / 模型 / 服务 / 关于）
-├── Services/             # 翻译服务、HTTP 服务、IPC
+├── Services/             # 翻译服务、HTTP 服务、IPC、证书管理、系统代理
 ├── TrayIcon/             # 托盘图标
 ├── Tests/                # IPC 相关测试
 └── Assets/               # 应用图标

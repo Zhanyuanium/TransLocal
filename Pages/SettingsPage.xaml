@@ -66,6 +66,16 @@
                     <toolkit:SettingsCard x:Uid="PortCard" Header="Port" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
                         <TextBox x:Name="PortBox" x:Uid="PortBox" PlaceholderText="52860" MinWidth="120" VerticalAlignment="Center"/>
                     </toolkit:SettingsCard>
+                    <toolkit:SettingsCard x:Uid="ApiProxyCard" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
+                        <StackPanel Spacing="8">
+                            <TextBlock x:Name="ApiProxyHintText" TextWrapping="Wrap"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="OpenProxySettingsButton" x:Uid="OpenProxySettingsButton" Click="OpenProxySettingsButton_Click"/>
+                                <Button x:Name="ExportCertButton" x:Uid="ExportCertButton" Click="ExportCertButton_Click"/>
+                                <Button x:Name="InstallCertButton" x:Uid="InstallCertButton" Click="InstallCertButton_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </toolkit:SettingsCard>
                     <toolkit:SettingsExpander x:Uid="EndpointsExpander" Header="Simulated endpoints" HorizontalAlignment="Stretch">
                         <toolkit:SettingsExpander.Items>
                             <toolkit:SettingsCard ContentAlignment="Left" IsClickEnabled="False" IsActionIconVisible="False">

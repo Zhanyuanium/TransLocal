@@ -46,7 +46,7 @@
     <value>Foundry Local 模型</value>
   </data>
   <data name="ModelAliasBox.PlaceholderText" xml:space="preserve">
-    <value>phi-3.5-mini</value>
+    <value>phi-4-mini</value>
   </data>
   <data name="StrategyCard.Header" xml:space="preserve">
     <value>运行策略</value>
@@ -71,6 +71,33 @@
   </data>
   <data name="PortCard.Header" xml:space="preserve">
     <value>端口</value>
+  </data>
+  <data name="ApiProxyCard.Header" xml:space="preserve">
+    <value>API 代理（拦截 DeepL/Google）</value>
+  </data>
+  <data name="ApiProxyHintFormat" xml:space="preserve">
+    <value>请将系统代理设为 127.0.0.1:{0}，并安装 CA 证书。</value>
+  </data>
+  <data name="OpenProxySettingsButton.Content" xml:space="preserve">
+    <value>打开代理设置</value>
+  </data>
+  <data name="ExportCertButton.Content" xml:space="preserve">
+    <value>导出 CA 证书</value>
+  </data>
+  <data name="InstallCertButton.Content" xml:space="preserve">
+    <value>安装 CA 证书</value>
+  </data>
+  <data name="InstallCertSuccessTitle" xml:space="preserve">
+    <value>证书已安装</value>
+  </data>
+  <data name="InstallCertSuccessContent" xml:space="preserve">
+    <value>CA 证书已安装到受信任的根证书存储。</value>
+  </data>
+  <data name="InstallCertFailTitle" xml:space="preserve">
+    <value>安装失败</value>
+  </data>
+  <data name="InstallCertFailContent" xml:space="preserve">
+    <value>无法自动安装。请导出证书后手动安装。</value>
   </data>
   <data name="PortBox.PlaceholderText" xml:space="preserve">
     <value>52860</value>

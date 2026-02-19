@@ -14,11 +14,14 @@ public partial class App : Application
     private TrayIconManager? _trayIcon;
     private AppSettings _settings = new();
     private TranslationService? _translationService;
+    private CertificateManager? _certManager;
     private HttpTranslationServer? _httpServer;
     private IpcServer? _ipcServer;
 
     public static AppSettings Settings => (Current as App)!._settings;
+    public static MainWindow? MainWindow => (Current as App)!._window;
     public static TranslationService TranslationService => (Current as App)!._translationService!;
+    public static CertificateManager CertManager => (Current as App)!._certManager!;
     public static HttpTranslationServer HttpServer => (Current as App)!._httpServer!;
 
     public App()
@@ -34,7 +37,8 @@ public partial class App : Application
         if (_settings.DebugLogEnabled)
             DebugLog.IsEnabled = true;
         _translationService = new TranslationService(_settings);
-        _httpServer = new HttpTranslationServer(_settings, _translationService);
+        _certManager = new CertificateManager();
+        _httpServer = new HttpTranslationServer(_settings, _translationService, _certManager);
         _httpServer.Start();
 
         _trayIcon = new TrayIconManager(ShowSettings, DoExit);
@@ -76,8 +80,9 @@ public partial class App : Application
         _settings = await SettingsService.LoadAsync();
         _translationService!.UpdateSettings(_settings);
         _httpServer!.Stop();
-        _httpServer = new HttpTranslationServer(_settings, _translationService);
+        _httpServer = new HttpTranslationServer(_settings, _translationService, _certManager!);
         _httpServer.Start();
+
     }
 
     private static async Task<string> GetStatusAsync()

@@ -1,7 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Security;
+using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using local_translate_provider.ApiAdapters;
 using local_translate_provider.Models;
@@ -11,19 +15,29 @@ namespace local_translate_provider.Services;
 
 /// <summary>
 /// HTTP server that exposes DeepL and Google Translate format endpoints.
+/// Uses TcpListener for single-port handling: CONNECT (proxy) and direct HTTP.
 /// </summary>
 public sealed class HttpTranslationServer
 {
+    private static readonly HashSet<string> InterceptedHosts = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "api-free.deepl.com",
+        "api.deepl.com",
+        "translate.googleapis.com"
+    };
+
     private readonly AppSettings _settings;
     private readonly TranslationService _translationService;
-    private HttpListener? _listener;
+    private readonly CertificateManager _certManager;
+    private TcpListener? _listener;
     private Task? _runTask;
     private readonly object _lock = new();
 
-    public HttpTranslationServer(AppSettings settings, TranslationService translationService)
+    public HttpTranslationServer(AppSettings settings, TranslationService translationService, CertificateManager certManager)
     {
         _settings = settings;
         _translationService = translationService;
+        _certManager = certManager;
     }
 
     public void Start()
@@ -33,10 +47,7 @@ public sealed class HttpTranslationServer
             if (_listener != null) return;
 
             var port = _settings.Port;
-            var prefix = $"http://localhost:{port}/";
-            _listener = new HttpListener();
-            _listener.Prefixes.Add(prefix);
-
+            _listener = new TcpListener(IPAddress.Loopback, port);
             _listener.Start();
             _runTask = RunAsync();
         }
@@ -47,7 +58,6 @@ public sealed class HttpTranslationServer
         lock (_lock)
         {
             _listener?.Stop();
-            _listener?.Close();
             _listener = null;
         }
     }
@@ -60,76 +70,249 @@ public sealed class HttpTranslationServer
 
     private async Task RunAsync()
     {
-        while (_listener != null && _listener.IsListening)
+        while (_listener != null)
         {
             try
             {
-                var ctx = await _listener.GetContextAsync();
-                _ = HandleRequestAsync(ctx);
+                var client = await _listener.AcceptTcpClientAsync();
+                _ = HandleConnectionAsync(client);
             }
-            catch (HttpListenerException) { break; }
             catch (ObjectDisposedException) { break; }
+            catch (InvalidOperationException) { break; }
         }
     }
 
-    private async Task HandleRequestAsync(HttpListenerContext ctx)
+    private async Task HandleConnectionAsync(TcpClient client)
     {
-        var req = ctx.Request;
-        var resp = ctx.Response;
-
-        if (req.HttpMethod != "POST")
-        {
-            resp.StatusCode = 405;
-            resp.Close();
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(_settings.ApiKey) &&
-            req.Headers["Authorization"] != $"DeepL-Auth-Key {_settings.ApiKey}" &&
-            req.Headers["Authorization"] != $"Bearer {_settings.ApiKey}")
-        {
-            resp.StatusCode = 401;
-            resp.Close();
-            return;
-        }
-
         try
         {
-            var path = req.Url?.AbsolutePath.TrimEnd('/') ?? "";
-            if (_settings.EnableDeepLEndpoint && path.EndsWith("/v2/translate", StringComparison.OrdinalIgnoreCase))
+            using (client)
+            using (var stream = client.GetStream())
             {
-                await HandleDeepLAsync(ctx).ConfigureAwait(false);
-                return;
-            }
-            if (_settings.EnableGoogleEndpoint && path.Contains(":translateText", StringComparison.OrdinalIgnoreCase))
-            {
-                await HandleGoogleAsync(ctx).ConfigureAwait(false);
-                return;
-            }
+                var firstByte = stream.ReadByte();
+                if (firstByte < 0) return;
 
-            resp.StatusCode = 404;
+                if (firstByte == 'C')
+                {
+                    await HandleProxyAsync(stream, new byte[] { (byte)firstByte }).ConfigureAwait(false);
+                    return;
+                }
+                if (firstByte == 'P' || firstByte == 'G')
+                {
+                    var buffer = new byte[1] { (byte)firstByte };
+                    await HandleHttpAsync(stream, buffer).ConfigureAwait(false);
+                    return;
+                }
+            }
         }
-        catch (Exception)
+        catch { /* Connection closed or error */ }
+    }
+
+    private async Task HandleProxyAsync(Stream rawStream, byte[] prefix)
+    {
+        var (method, path, host, headers, body) = await ParseHttpRequestAsync(rawStream, prefix).ConfigureAwait(false);
+
+        if (method != "CONNECT" || string.IsNullOrEmpty(host))
         {
-            resp.StatusCode = 500;
+            await WriteHttpErrorAsync(rawStream, 400, "Bad Request").ConfigureAwait(false);
+            return;
         }
+
+        var hostOnly = host.Contains(':') ? host.Split(':')[0] : host;
+        if (!InterceptedHosts.Contains(hostOnly))
+        {
+            await TunnelConnectAsync(rawStream, host, hostOnly).ConfigureAwait(false);
+            return;
+        }
+
+        await WriteHttpResponseAsync(rawStream, 200, "Connection Established", Array.Empty<KeyValuePair<string, string>>(), null).ConfigureAwait(false);
+        await rawStream.FlushAsync().ConfigureAwait(false);
+
+        var cert = _certManager.GetOrCreateServerCert(hostOnly);
+        using var ssl = new SslStream(rawStream, leaveInnerStreamOpen: false);
+        await ssl.AuthenticateAsServerAsync(
+            new SslServerAuthenticationOptions
+            {
+                ServerCertificate = cert,
+                EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13
+            }).ConfigureAwait(false);
+
+        var (method2, path2, _, headers2, body2) = await ParseHttpRequestAsync(ssl, null).ConfigureAwait(false);
+        await DispatchRequestAsync(ssl, method2, path2, headers2, body2).ConfigureAwait(false);
+    }
+
+    private static async Task TunnelConnectAsync(Stream clientStream, string host, string hostOnly)
+    {
+        var port = 443;
+        if (host.Contains(':'))
+        {
+            var parts = host.Split(':');
+            if (parts.Length >= 2 && int.TryParse(parts[1], out var p))
+                port = p;
+        }
+
+        using var upstream = new TcpClient();
+        try
+        {
+            await upstream.ConnectAsync(hostOnly, port);
+        }
+        catch
+        {
+            await WriteHttpErrorAsync(clientStream, 502, "Bad Gateway").ConfigureAwait(false);
+            return;
+        }
+
+        await WriteHttpResponseAsync(clientStream, 200, "Connection Established",
+            Array.Empty<KeyValuePair<string, string>>(), null).ConfigureAwait(false);
+        await clientStream.FlushAsync().ConfigureAwait(false);
+
+        using var upstreamStream = upstream.GetStream();
+        using var cts = new CancellationTokenSource();
+        var toUpstream = clientStream.CopyToAsync(upstreamStream, cts.Token);
+        var toClient = upstreamStream.CopyToAsync(clientStream, cts.Token);
+        try
+        {
+            await Task.WhenAny(toUpstream, toClient).ConfigureAwait(false);
+        }
+        catch (IOException) { /* Connection closed */ }
         finally
         {
-            resp.Close();
+            cts.Cancel();
         }
     }
 
-    private async Task HandleDeepLAsync(HttpListenerContext ctx)
+    private async Task HandleHttpAsync(Stream stream, byte[] prefix)
     {
-        var req = ctx.Request;
-        var resp = ctx.Response;
-        resp.ContentType = "application/json; charset=utf-8";
+        var (method, path, _, headers, body) = await ParseHttpRequestAsync(stream, prefix).ConfigureAwait(false);
+        await DispatchRequestAsync(stream, method, path, headers, body).ConfigureAwait(false);
+    }
 
+    private async Task DispatchRequestAsync(Stream responseStream, string method, string path, IReadOnlyDictionary<string, string> headers, byte[]? body)
+    {
+        if (method != "POST")
+        {
+            await WriteHttpErrorAsync(responseStream, 405, "Method Not Allowed").ConfigureAwait(false);
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(_settings.ApiKey))
+        {
+            var auth = headers.TryGetValue("Authorization", out var a) ? a : null;
+            if (auth != $"DeepL-Auth-Key {_settings.ApiKey}" && auth != $"Bearer {_settings.ApiKey}")
+            {
+                await WriteHttpErrorAsync(responseStream, 401, "Unauthorized").ConfigureAwait(false);
+                return;
+            }
+        }
+
+        var pathNorm = path.TrimEnd('/');
+        if (_settings.EnableDeepLEndpoint && pathNorm.EndsWith("/v2/translate", StringComparison.OrdinalIgnoreCase))
+        {
+            await HandleDeepLCoreAsync(responseStream, body).ConfigureAwait(false);
+            return;
+        }
+        if (_settings.EnableGoogleEndpoint && path.Contains(":translateText", StringComparison.OrdinalIgnoreCase))
+        {
+            await HandleGoogleCoreAsync(responseStream, body).ConfigureAwait(false);
+            return;
+        }
+
+        await WriteHttpErrorAsync(responseStream, 404, "Not Found").ConfigureAwait(false);
+    }
+
+    private static async Task<(string method, string path, string? host, IReadOnlyDictionary<string, string> headers, byte[]? body)> ParseHttpRequestAsync(Stream stream, byte[]? prefix)
+    {
+        var buffer = new List<byte>();
+        if (prefix != null) buffer.AddRange(prefix);
+
+        var headerEnd = -1;
+
+        while (true)
+        {
+            var b = stream.ReadByte();
+            if (b < 0) break;
+            buffer.Add((byte)b);
+            if (buffer.Count >= 4)
+            {
+                var n = buffer.Count;
+                if (buffer[n - 4] == 13 && buffer[n - 3] == 10 && buffer[n - 2] == 13 && buffer[n - 1] == 10)
+                {
+                    headerEnd = buffer.Count;
+                    break;
+                }
+            }
+        }
+
+        if (headerEnd < 0)
+            return ("", "", null, new Dictionary<string, string>(), null);
+
+        var headerBytes = buffer.Take(headerEnd).ToArray();
+        var headerText = Encoding.ASCII.GetString(headerBytes);
+        var lines = headerText.Split(new[] { "\r\n" }, StringSplitOptions.None);
+        if (lines.Length < 1) return ("", "", null, new Dictionary<string, string>(), null);
+
+        var requestLine = lines[0].Split(' ', 3);
+        var method = requestLine.Length >= 1 ? requestLine[0] : "";
+        var path = requestLine.Length >= 2 ? requestLine[1] : "";
+
+        var headersDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 1; i < lines.Length; i++)
+        {
+            var idx = lines[i].IndexOf(':');
+            if (idx > 0)
+            {
+                var key = lines[i][..idx].Trim();
+                var value = lines[i][(idx + 1)..].Trim();
+                headersDict[key] = value;
+            }
+        }
+
+        headersDict.TryGetValue("Host", out var host);
+
+        byte[]? body = null;
+        if (headersDict.TryGetValue("Content-Length", out var clStr) && int.TryParse(clStr, out var contentLength) && contentLength > 0)
+        {
+            body = new byte[contentLength];
+            var read = 0;
+            while (read < contentLength)
+            {
+                var n = await stream.ReadAsync(body, read, contentLength - read).ConfigureAwait(false);
+                if (n == 0) break;
+                read += n;
+            }
+        }
+
+        return (method, path, host, headersDict, body);
+    }
+
+    private static async Task WriteHttpResponseAsync(Stream stream, int statusCode, string statusText,
+        IEnumerable<KeyValuePair<string, string>> headers, byte[]? body)
+    {
+        var sb = new StringBuilder();
+        sb.Append($"HTTP/1.1 {statusCode} {statusText}\r\n");
+        foreach (var (k, v) in headers)
+            sb.Append($"{k}: {v}\r\n");
+        if (body != null)
+            sb.Append($"Content-Length: {body.Length}\r\n");
+        sb.Append("\r\n");
+        var headerBytes = Encoding.ASCII.GetBytes(sb.ToString());
+        await stream.WriteAsync(headerBytes).ConfigureAwait(false);
+        if (body != null && body.Length > 0)
+            await stream.WriteAsync(body).ConfigureAwait(false);
+    }
+
+    private static async Task WriteHttpErrorAsync(Stream stream, int statusCode, string message)
+    {
+        var body = Encoding.UTF8.GetBytes($"{{\"error\":\"{message}\"}}");
+        var headers = new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") };
+        await WriteHttpResponseAsync(stream, statusCode, message, headers, body).ConfigureAwait(false);
+    }
+
+    private async Task HandleDeepLCoreAsync(Stream responseStream, byte[]? body)
+    {
         try
         {
-            using var reader = new StreamReader(req.InputStream, Encoding.UTF8);
-            var body = await reader.ReadToEndAsync();
-            using var ms = new MemoryStream(Encoding.UTF8.GetBytes(body));
+            using var ms = body != null ? new MemoryStream(body) : new MemoryStream();
             var (texts, targetLang, sourceLang) = await DeepLApiAdapter.ParseRequestAsync(ms, default);
 
             var translations = new List<object>();
@@ -143,34 +326,25 @@ public sealed class HttpTranslationServer
 
             var json = System.Text.Json.JsonSerializer.Serialize(new { translations });
             var buf = Encoding.UTF8.GetBytes(json);
-            resp.ContentLength64 = buf.Length;
-            await resp.OutputStream.WriteAsync(buf);
+            await WriteHttpResponseAsync(responseStream, 200, "OK",
+                new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
+                buf).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            resp.StatusCode = 500;
             var err = System.Text.Json.JsonSerializer.Serialize(new { message = ex.Message });
             var buf = Encoding.UTF8.GetBytes(err);
-            resp.ContentLength64 = buf.Length;
-            await resp.OutputStream.WriteAsync(buf);
-        }
-        finally
-        {
-            resp.OutputStream.Close();
+            await WriteHttpResponseAsync(responseStream, 500, "Internal Server Error",
+                new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
+                buf).ConfigureAwait(false);
         }
     }
 
-    private async Task HandleGoogleAsync(HttpListenerContext ctx)
+    private async Task HandleGoogleCoreAsync(Stream responseStream, byte[]? body)
     {
-        var req = ctx.Request;
-        var resp = ctx.Response;
-        resp.ContentType = "application/json; charset=utf-8";
-
         try
         {
-            using var reader = new StreamReader(req.InputStream, Encoding.UTF8);
-            var body = await reader.ReadToEndAsync();
-            using var ms = new MemoryStream(Encoding.UTF8.GetBytes(body));
+            using var ms = body != null ? new MemoryStream(body) : new MemoryStream();
             var (contents, sourceLang, targetLang) = await GoogleApiAdapter.ParseRequestAsync(ms, default);
 
             var translations = new List<object>();
@@ -184,20 +358,17 @@ public sealed class HttpTranslationServer
 
             var json = System.Text.Json.JsonSerializer.Serialize(new { translations, glossaryTranslations = Array.Empty<object>() });
             var buf = Encoding.UTF8.GetBytes(json);
-            resp.ContentLength64 = buf.Length;
-            await resp.OutputStream.WriteAsync(buf);
+            await WriteHttpResponseAsync(responseStream, 200, "OK",
+                new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
+                buf).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            resp.StatusCode = 500;
             var err = System.Text.Json.JsonSerializer.Serialize(new { error = new { message = ex.Message } });
             var buf = Encoding.UTF8.GetBytes(err);
-            resp.ContentLength64 = buf.Length;
-            await resp.OutputStream.WriteAsync(buf);
-        }
-        finally
-        {
-            resp.OutputStream.Close();
+            await WriteHttpResponseAsync(responseStream, 500, "Internal Server Error",
+                new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
+                buf).ConfigureAwait(false);
         }
     }
 }
