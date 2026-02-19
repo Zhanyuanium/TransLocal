@@ -19,7 +19,7 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         InitializeComponent();
-        BackendCombo.SelectionChanged += (_, _) => UpdateBackendVisibility();
+        BackendCombo.SelectionChanged += (_, _) => { UpdateBackendVisibility(); UpdateStrategyVisibility(); };
         StrategyCombo.SelectionChanged += (_, _) => UpdateStrategyVisibility();
     }
 
@@ -148,6 +148,25 @@ public sealed partial class SettingsPage : Page
         }
     }
 
+    private async void UnloadModelButton_Click(object sender, RoutedEventArgs e)
+    {
+        UnloadModelButton.IsEnabled = false;
+        try
+        {
+            await App.TranslationService.UnloadModelAsync();
+            StatusText.Text = ResLoader.GetString("UnloadModelSuccess");
+            await RefreshStatusAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusText.Text = $"{ResLoader.GetString("StatusPrefix")}{ex.Message}";
+        }
+        finally
+        {
+            UnloadModelButton.IsEnabled = true;
+        }
+    }
+
     private async void DebugLogSwitch_Toggled(object sender, RoutedEventArgs e)
     {
         var s = App.Settings;
@@ -160,12 +179,13 @@ public sealed partial class SettingsPage : Page
     {
         var isFoundry = BackendCombo.SelectedIndex == 1;
         FoundryPanel.Visibility = isFoundry ? Visibility.Visible : Visibility.Collapsed;
+        ManualDeviceBorder.Visibility = isFoundry ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void UpdateStrategyVisibility()
     {
         var isManual = StrategyCombo.SelectedIndex == 2;
-        ManualDeviceBorder.Visibility = isManual ? Visibility.Visible : Visibility.Collapsed;
+        DeviceComboContainer.Visibility = isManual ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async System.Threading.Tasks.Task RefreshStatusAsync()

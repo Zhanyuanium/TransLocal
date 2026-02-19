@@ -63,6 +63,12 @@
   <data name="DeviceCard.Header" xml:space="preserve">
     <value>设备</value>
   </data>
+  <data name="UnloadModelButton.Content" xml:space="preserve">
+    <value>卸载模型</value>
+  </data>
+  <data name="UnloadModelSuccess" xml:space="preserve">
+    <value>模型已卸载</value>
+  </data>
   <data name="SaveButton.Content" xml:space="preserve">
     <value>保存并重启服务</value>
   </data>

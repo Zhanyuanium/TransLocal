@@ -51,11 +51,16 @@
                             </ComboBox>
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard x:Name="ManualDeviceBorder" x:Uid="DeviceCard" Visibility="Collapsed" Header="Device" IsClickEnabled="False" IsActionIconVisible="False" HorizontalAlignment="Stretch">
-                            <ComboBox x:Name="DeviceCombo" MinWidth="180" VerticalAlignment="Center">
-                                <ComboBoxItem Content="CPU" Tag="CPU"/>
-                                <ComboBoxItem Content="GPU" Tag="GPU"/>
-                                <ComboBoxItem Content="NPU" Tag="NPU"/>
-                            </ComboBox>
+                            <StackPanel Spacing="8">
+                                <StackPanel x:Name="DeviceComboContainer" Visibility="Collapsed">
+                                    <ComboBox x:Name="DeviceCombo" MinWidth="180" VerticalAlignment="Center">
+                                        <ComboBoxItem Content="CPU" Tag="CPU"/>
+                                        <ComboBoxItem Content="GPU" Tag="GPU"/>
+                                        <ComboBoxItem Content="NPU" Tag="NPU"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <Button x:Name="UnloadModelButton" x:Uid="UnloadModelButton" HorizontalAlignment="Left"/>
+                            </StackPanel>
                         </toolkit:SettingsCard>
                     </StackPanel>
                     <Button x:Name="SaveButton" x:Uid="SaveButton" Content="Save and restart" Click="SaveButton_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0"/>

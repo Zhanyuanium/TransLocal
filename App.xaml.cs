@@ -48,6 +48,7 @@ public partial class App : Application
             onGui: () => dq.TryEnqueue(ShowSettings),
             onQuit: () => dq.TryEnqueue(DoExit),
             onReload: () => dq.TryEnqueue(ReloadSettings),
+            onUnload: () => dq.TryEnqueue(OnUnloadModel),
             getStatusAsync: GetStatusAsync);
         _ipcServer.Start();
 
@@ -73,6 +74,11 @@ public partial class App : Application
     private void ReloadSettings()
     {
         _ = ReloadSettingsAsync();
+    }
+
+    private void OnUnloadModel()
+    {
+        _ = _translationService!.UnloadModelAsync();
     }
 
     private async System.Threading.Tasks.Task ReloadSettingsAsync()

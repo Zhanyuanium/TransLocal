@@ -32,4 +32,8 @@ public sealed class TranslationService : ITranslationService
 
     public Task<TranslationServiceStatus> GetStatusAsync(CancellationToken cancellationToken = default) =>
         GetBackend().GetStatusAsync(cancellationToken);
+
+    /// <summary>卸载 Foundry Local 模型，释放内存。Phi Silica 无持久模型，无操作。</summary>
+    public Task UnloadModelAsync(CancellationToken cancellationToken = default) =>
+        _foundryLocal.UnloadModelAsync(cancellationToken);
 }

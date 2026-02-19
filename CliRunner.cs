@@ -135,7 +135,7 @@ Commands:
   status              Print backend status (from running app or standalone)
   about               Print app name and version
   config general      General settings (--run-at-startup, --minimize-tray)
-  config model        Model settings (--backend, --model, --strategy, --device)
+  config model        Model settings (--backend, --model, --strategy, --device, --unload)
   config service      Service settings (--port, --deeple, --google, --api-key)
 
 Options:
@@ -292,6 +292,16 @@ Options:
     {
         try
         {
+            for (var i = 0; i < args.Length; i++)
+            {
+                if (args[i] is "--unload")
+                {
+                    var (ok, _) = IpcClient.Send("unload");
+                    Console.WriteLine(ok ? "Model unloaded." : "No running app to unload from.");
+                    return ok ? 0 : 1;
+                }
+            }
+
             var settings = LoadSettingsAsync().GetAwaiter().GetResult();
             var modified = false;
 
@@ -338,7 +348,7 @@ Options:
 
             if (!modified)
             {
-                Console.Error.WriteLine("Error: No changes. Use --backend, --model, --strategy, --device");
+                Console.Error.WriteLine("Error: No changes. Use --backend, --model, --strategy, --device, --unload");
                 return 1;
             }
 

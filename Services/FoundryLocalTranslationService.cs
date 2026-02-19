@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using local_translate_provider;
 using local_translate_provider.Models;
 using Microsoft.AI.Foundry.Local;
 using Microsoft.Extensions.Logging;
@@ -103,6 +104,7 @@ public sealed class FoundryLocalTranslationService : ITranslationService
                 await _loadedModel.UnloadAsync().ConfigureAwait(false);
                 _loadedModel = null;
                 _chatClient = null;
+                MemoryHelper.TrimWorkingSetAsync();
             }
 
             await EnsureManagerCreatedAsync(ct).ConfigureAwait(false);
@@ -195,11 +197,51 @@ public sealed class FoundryLocalTranslationService : ITranslationService
         catch (Exception ex) when (ex.Message.Contains("already been created", StringComparison.OrdinalIgnoreCase)) { }
     }
 
-    /// <summary>设置变更时强制重新加载。</summary>
+    /// <summary>设置变更时强制重新加载，后台卸载当前模型并回收内存。</summary>
     public void InvalidateLoadedModel()
     {
+        var toUnload = _loadedModel;
         _loadedModel = null;
         _chatClient = null;
         _loadedAlias = null;
+        _loadedStrategy = default;
+        _loadedDevice = default;
+        if (toUnload != null)
+            _ = UnloadAndTrimAsync(toUnload);
+    }
+
+    private static async Task UnloadAndTrimAsync(Microsoft.AI.Foundry.Local.IModel model)
+    {
+        try
+        {
+            await model.UnloadAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            MemoryHelper.TrimWorkingSetAsync();
+        }
+    }
+
+    /// <summary>手动卸载当前模型，释放内存并归还工作集。</summary>
+    public async Task UnloadModelAsync(CancellationToken cancellationToken = default)
+    {
+        await _initLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            if (_loadedModel != null)
+            {
+                await _loadedModel.UnloadAsync().ConfigureAwait(false);
+                _loadedModel = null;
+                _chatClient = null;
+                _loadedAlias = null;
+                _loadedStrategy = default;
+                _loadedDevice = default;
+            }
+        }
+        finally
+        {
+            _initLock.Release();
+        }
+        MemoryHelper.TrimWorkingSetAsync();
     }
 }

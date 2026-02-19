@@ -9,7 +9,7 @@ using local_translate_provider;
 namespace local_translate_provider.Services;
 
 /// <summary>
-/// Named Pipe 服务端，供 CLI 向已运行的托盘实例发送 gui/quit/reload/status 命令。
+/// Named Pipe 服务端，供 CLI 向已运行的托盘实例发送 gui/quit/reload/status/unload 命令。
 /// </summary>
 public sealed class IpcServer : IDisposable
 {
@@ -17,15 +17,17 @@ public sealed class IpcServer : IDisposable
     private readonly Action _onGui;
     private readonly Action _onQuit;
     private readonly Action _onReload;
+    private readonly Action _onUnload;
     private readonly Func<Task<string>> _getStatusAsync;
     private CancellationTokenSource? _cts;
     private Task? _listenTask;
 
-    public IpcServer(Action onGui, Action onQuit, Action onReload, Func<Task<string>> getStatusAsync)
+    public IpcServer(Action onGui, Action onQuit, Action onReload, Action onUnload, Func<Task<string>> getStatusAsync)
     {
         _onGui = onGui;
         _onQuit = onQuit;
         _onReload = onReload;
+        _onUnload = onUnload;
         _getStatusAsync = getStatusAsync;
     }
 
@@ -67,6 +69,9 @@ public sealed class IpcServer : IDisposable
                         break;
                     case "reload":
                         _onReload();
+                        break;
+                    case "unload":
+                        _onUnload();
                         break;
                     case "status":
                         DebugLog.Write("[IpcServer] _getStatusAsync start");

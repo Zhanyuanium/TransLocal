@@ -45,7 +45,7 @@ dotnet build -p:Platform=x64
 ## 命令行用法
 
 ```
-local-translate-provider             启动托盘并退出
+local-translate-provider            启动托盘并退出
 local-translate-provider gui        打开主窗口（或启动新实例）
 local-translate-provider quit       退出已运行的托盘
 local-translate-provider status     显示翻译后端状态
@@ -139,6 +139,12 @@ local-translate-provider/
 ├── Tests/                # IPC 相关测试
 └── Assets/               # 应用图标
 ```
+
+## FAQ
+
+**卸载模型后，任务管理器显示内存已降，但本机内存占用并未下降，RamMap 中本应用进程的 Modified 仍有数 GB？**
+
+这是 Windows 的正常行为。卸载时进程的 Private 会下降，但曾被模型占用的物理页会进入 Modified 列表（脏页），需由系统在内存紧张时回收。EmptyWorkingSet 只影响工作集，无法直接释放 Modified 页。这些页会在系统需要内存时自动回收，无需额外操作。
 
 ## 许可证
 

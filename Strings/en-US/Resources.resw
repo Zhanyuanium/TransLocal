@@ -63,6 +63,12 @@
   <data name="DeviceCard.Header" xml:space="preserve">
     <value>Device</value>
   </data>
+  <data name="UnloadModelButton.Content" xml:space="preserve">
+    <value>Unload model</value>
+  </data>
+  <data name="UnloadModelSuccess" xml:space="preserve">
+    <value>Model unloaded</value>
+  </data>
   <data name="SaveButton.Content" xml:space="preserve">
     <value>Save and restart service</value>
   </data>
