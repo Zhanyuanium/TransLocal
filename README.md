@@ -87,12 +87,20 @@ Authorization: DeepL-Auth-Key <api-key>  # 可选
 
 ### Google 格式
 
+**新版（POST）**
+
 ```
 POST http://localhost:52860/language/translate/v2
 Content-Type: application/json
 Authorization: Bearer <api-key>  # 可选
 
 {"q": ["Hello"], "target": "zh", "source": "en"}
+```
+
+**旧版（GET，translate_a 格式）**
+
+```
+GET http://localhost:52860/translate_a/single?q=Hello&sl=en&tl=zh
 ```
 
 ## 配置说明

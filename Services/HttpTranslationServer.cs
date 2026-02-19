@@ -189,6 +189,15 @@ public sealed class HttpTranslationServer
 
     private async Task DispatchRequestAsync(Stream responseStream, string method, string path, IReadOnlyDictionary<string, string> headers, byte[]? body)
     {
+        var pathWithoutQuery = path.Contains('?') ? path[..path.IndexOf('?')] : path;
+        var pathNorm = pathWithoutQuery.TrimEnd('/');
+
+        if (_settings.EnableGoogleEndpoint && pathNorm.EndsWith("/translate_a/single", StringComparison.OrdinalIgnoreCase) && method == "GET")
+        {
+            await HandleGoogleLegacySingleAsync(responseStream, path).ConfigureAwait(false);
+            return;
+        }
+
         if (method != "POST")
         {
             await WriteHttpErrorAsync(responseStream, 405, "Method Not Allowed").ConfigureAwait(false);
@@ -205,7 +214,6 @@ public sealed class HttpTranslationServer
             }
         }
 
-        var pathNorm = path.TrimEnd('/');
         if (_settings.EnableDeepLEndpoint && pathNorm.EndsWith("/v2/translate", StringComparison.OrdinalIgnoreCase))
         {
             await HandleDeepLCoreAsync(responseStream, body).ConfigureAwait(false);
@@ -370,5 +378,62 @@ public sealed class HttpTranslationServer
                 new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
                 buf).ConfigureAwait(false);
         }
+    }
+
+    private async Task HandleGoogleLegacySingleAsync(Stream responseStream, string path)
+    {
+        try
+        {
+            var query = path.Contains('?') ? path[(path.IndexOf('?') + 1)..] : "";
+            var qs = ParseQueryString(query);
+            var q = qs.TryGetValue("q", out var qv) ? qv : "";
+            var sl = qs.TryGetValue("sl", out var slv) ? slv : "auto";
+            var tl = qs.TryGetValue("tl", out var tlv) ? tlv : "en";
+
+            if (string.IsNullOrEmpty(q))
+            {
+                await WriteHttpErrorAsync(responseStream, 400, "Missing 'q' parameter").ConfigureAwait(false);
+                return;
+            }
+
+            var src = sl == "auto" ? "en" : sl;
+            var translated = await _translationService.TranslateAsync(q, src, tl, default).ConfigureAwait(false);
+            var json = BuildGoogleLegacyResponse(translated, q, src);
+            var buf = Encoding.UTF8.GetBytes(json);
+            await WriteHttpResponseAsync(responseStream, 200, "OK",
+                new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
+                buf).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            var err = System.Text.Json.JsonSerializer.Serialize(new { error = ex.Message });
+            var buf = Encoding.UTF8.GetBytes(err);
+            await WriteHttpResponseAsync(responseStream, 500, "Internal Server Error",
+                new[] { new KeyValuePair<string, string>("Content-Type", "application/json; charset=utf-8") },
+                buf).ConfigureAwait(false);
+        }
+    }
+
+    private static IReadOnlyDictionary<string, string> ParseQueryString(string query)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in query.Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var idx = pair.IndexOf('=');
+            if (idx >= 0)
+            {
+                var key = Uri.UnescapeDataString(pair[..idx].Replace('+', ' '));
+                var value = Uri.UnescapeDataString(pair[(idx + 1)..].Replace('+', ' '));
+                dict[key] = value;
+            }
+        }
+        return dict;
+    }
+
+    private static string BuildGoogleLegacyResponse(string translated, string original, string sourceLang)
+    {
+        var escaped = System.Text.Json.JsonSerializer.Serialize(translated);
+        var origEscaped = System.Text.Json.JsonSerializer.Serialize(original);
+        return $"[[[{escaped},{origEscaped},null,null,3]],null,\"{sourceLang}\"]";
     }
 }
