@@ -142,6 +142,10 @@ TransLocal/
 
 ## FAQ
 
+**如何卸载 TransLocal CA 证书？**
+
+若你曾通过设置页「安装 CA 证书」将 TransLocal CA 安装到系统，可手动卸载：按 `Win+R`，输入 `certmgr.msc` 回车，在「受信任的根证书颁发机构」→「证书」下找到名为 **TransLocal CA** 的条目，右键 →「删除」即可。该证书仅安装在当前用户存储中，删除后浏览器等应用将不再信任由 TransLocal 签发的代理证书。
+
 **卸载模型后，任务管理器显示内存已降，但本机内存占用并未下降，RamMap 中本应用进程的 Modified 仍有数 GB？**
 
 这是 Windows 的正常行为。卸载时进程的 Private 会下降，但曾被模型占用的物理页会进入 Modified 列表（脏页），需由系统在内存紧张时回收。EmptyWorkingSet 只影响工作集，无法直接释放 Modified 页。这些页会在系统需要内存时自动回收，无需额外操作。
