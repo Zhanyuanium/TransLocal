@@ -1,9 +1,11 @@
+using System.IO;
 using TransLocal.Pages;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Resources;
 using Windows.Graphics;
 
@@ -31,6 +33,9 @@ public sealed partial class MainWindow : Window
         UpdatePageTitle("General");
         NavigateTo("General");
         UpdatePaneDisplayMode();
+        var iconPath = Path.Combine(Package.Current.InstalledLocation.Path, "Assets", "AppIcon.ico");
+        AppWindow.SetTitleBarIcon(iconPath);
+        AppWindow.SetTaskbarIcon(iconPath);
         AppWindow.Closing += OnAppWindowClosing;
     }
 

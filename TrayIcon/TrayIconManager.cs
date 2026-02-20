@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.Resources;
 
 namespace TransLocal.TrayIcon;
@@ -26,7 +27,7 @@ public sealed class TrayIconManager : IDisposable
             ToolTipText = ResLoader.GetString("TrayToolTip"),
             DoubleClickCommand = new RelayCommand(_ => _onDoubleClick()),
             ContextFlyout = CreateContextMenu(),
-            IconSource = new GeneratedIconSource { Text = "译", Size = 16 }
+            IconSource = new BitmapImage(new Uri("ms-appx:///Assets/TrayIcon.mono.ico"))
         };
 
         _taskbarIcon.ForceCreate();
