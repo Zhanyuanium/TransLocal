@@ -1,9 +1,9 @@
 using System.Threading;
-using local_translate_provider.Models;
+using TransLocal.Models;
 using Microsoft.Windows.AI;
 using Microsoft.Windows.AI.Text;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Translation service using Phi Silica (Windows AI LanguageModel).

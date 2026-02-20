@@ -4,12 +4,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
-using local_translate_provider.Models;
-using local_translate_provider.Services;
+using TransLocal.Models;
+using TransLocal.Services;
 using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using Windows.ApplicationModel.Resources;
 
-namespace local_translate_provider;
+namespace TransLocal;
 
 public static class CliRunner
 {
@@ -140,16 +140,16 @@ public static class CliRunner
 
     private static void PrintHelp()
     {
-        Console.WriteLine(@"local-translate-provider - Local translation provider (DeepL/Google format)
+        Console.WriteLine(@"TransLocal - Local translation provider (DeepL/Google format)
 
 Usage:
-  local-translate-provider              Start tray (background), exit immediately
-  local-translate-provider gui         Open main window
-  local-translate-provider quit        Exit the running app
-  local-translate-provider status      Show translation backend status
-  local-translate-provider about       Show app info
-  local-translate-provider config      Modify settings (see config --help)
-  local-translate-provider --help      Show this help
+  TransLocal              Start tray (background), exit immediately
+  TransLocal gui         Open main window
+  TransLocal quit        Exit the running app
+  TransLocal status      Show translation backend status
+  TransLocal about       Show app info
+  TransLocal config      Modify settings (see config --help)
+  TransLocal --help      Show this help
 
 Commands:
   gui                 Open main window (or start app and show)
@@ -230,14 +230,14 @@ Options:
 
     private static int RunAbout()
     {
-        Console.WriteLine("Local Translate Provider");
+        Console.WriteLine("TransLocal");
         Console.WriteLine("Local translation provider with DeepL/Google format endpoints.");
         return 0;
     }
 
     private static void SpawnTrayWithWindow()
     {
-        var exe = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "local-translate-provider.exe";
+        var exe = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "TransLocal.exe";
         var startInfo = new ProcessStartInfo
         {
             FileName = exe,

@@ -1,7 +1,7 @@
 using System.Text.Json;
-using local_translate_provider.Services;
+using TransLocal.Services;
 
-namespace local_translate_provider.ApiAdapters;
+namespace TransLocal.ApiAdapters;
 
 /// <summary>
 /// Handles Google Translate v3-format translation requests and responses.

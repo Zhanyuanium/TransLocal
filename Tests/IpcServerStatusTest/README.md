@@ -6,9 +6,9 @@
 
 ## 手动验证步骤
 
-1. 构建主项目：`dotnet build local-translate-provider.csproj -p:Platform=x64`
-2. 启动托盘实例：`.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\local-translate-provider.exe --tray`
-3. 等待约 3 秒后，在另一终端运行：`.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\local-translate-provider.exe status`
+1. 构建主项目：`dotnet build TransLocal.csproj -p:Platform=x64`
+2. 启动托盘实例：`.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\TransLocal.exe --tray`
+3. 等待约 3 秒后，在另一终端运行：`.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\TransLocal.exe status`
 4. 若修复有效，应快速返回后端状态（Backend、Ready、Message 等），不再卡住
 
 ## 单元测试

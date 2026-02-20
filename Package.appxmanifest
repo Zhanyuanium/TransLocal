@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -9,14 +9,14 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="8d9d8248-3478-4ca9-97b1-8239b6e66413"
+    Name="doubao.TransLocal"
     Publisher="CN=doubao"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="8d9d8248-3478-4ca9-97b1-8239b6e66413" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>local-translate-provider</DisplayName>
+    <DisplayName>TransLocal</DisplayName>
     <PublisherDisplayName>doubao</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -35,8 +35,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="local-translate-provider"
-        Description="local-translate-provider"
+        DisplayName="TransLocal"
+        Description="TransLocal"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
@@ -46,7 +46,7 @@
       <Extensions>
         <uap5:Extension Category="windows.appExecutionAlias">
           <uap5:AppExecutionAlias>
-            <uap5:ExecutionAlias Alias="local-translate-provider.exe" />
+            <uap5:ExecutionAlias Alias="TransLocal.exe" />
           </uap5:AppExecutionAlias>
         </uap5:Extension>
       </Extensions>

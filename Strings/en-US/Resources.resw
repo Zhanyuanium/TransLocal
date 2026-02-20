@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="WindowTitle" xml:space="preserve">
-    <value>Local Translate Provider</value>
+    <value>TransLocal</value>
   </data>
   <data name="NavGeneral.Content" xml:space="preserve">
     <value>General</value>
@@ -127,7 +127,7 @@
     <value>About</value>
   </data>
   <data name="AppName.Text" xml:space="preserve">
-    <value>Local Translate Provider</value>
+    <value>TransLocal</value>
   </data>
   <data name="DebugLogCard.Header" xml:space="preserve">
     <value>Enable IPC debug log</value>
@@ -157,7 +157,7 @@
     <value>Saved. Service running at http://localhost:{0}</value>
   </data>
   <data name="TrayToolTip" xml:space="preserve">
-    <value>Local Translate Provider</value>
+    <value>TransLocal</value>
   </data>
   <data name="TrayShowSettings" xml:space="preserve">
     <value>Show settings</value>

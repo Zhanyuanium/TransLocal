@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="WindowTitle" xml:space="preserve">
-    <value>Local Translate Provider</value>
+    <value>TransLocal</value>
   </data>
   <data name="NavGeneral.Content" xml:space="preserve">
     <value>通用</value>
@@ -127,7 +127,7 @@
     <value>关于</value>
   </data>
   <data name="AppName.Text" xml:space="preserve">
-    <value>Local Translate Provider</value>
+    <value>TransLocal</value>
   </data>
   <data name="DebugLogCard.Header" xml:space="preserve">
     <value>启用 IPC 调试日志</value>
@@ -157,7 +157,7 @@
     <value>已保存。服务运行于 http://localhost:{0}</value>
   </data>
   <data name="TrayToolTip" xml:space="preserve">
-    <value>Local Translate Provider</value>
+    <value>TransLocal</value>
   </data>
   <data name="TrayShowSettings" xml:space="preserve">
     <value>显示设置</value>

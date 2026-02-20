@@ -1,6 +1,6 @@
-using local_translate_provider;
-using local_translate_provider.Models;
-using local_translate_provider.Services;
+using TransLocal;
+using TransLocal.Models;
+using TransLocal.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -8,7 +8,7 @@ using Microsoft.Windows.Storage.Pickers;
 using Windows.ApplicationModel.Resources;
 using Windows.System;
 
-namespace local_translate_provider.Pages;
+namespace TransLocal.Pages;
 
 public sealed partial class SettingsPage : Page
 {
@@ -111,7 +111,7 @@ public sealed partial class SettingsPage : Page
         if (window == null) return;
         var picker = new FileSavePicker(window.AppWindow.Id)
         {
-            SuggestedFileName = "local-translate-provider-ca.cer",
+            SuggestedFileName = "TransLocal-ca.cer",
             FileTypeChoices = { { "Certificate", new List<string> { ".cer" } } },
             DefaultFileExtension = ".cer"
         };

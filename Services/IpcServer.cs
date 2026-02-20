@@ -4,16 +4,16 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using local_translate_provider;
+using TransLocal;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Named Pipe 服务端，供 CLI 向已运行的托盘实例发送 gui/quit/reload/status/unload 命令。
 /// </summary>
 public sealed class IpcServer : IDisposable
 {
-    private const string PipeName = "LocalTranslateProvider_IPC";
+    private const string PipeName = "TransLocal_IPC";
     private readonly Action _onGui;
     private readonly Action _onQuit;
     private readonly Action _onReload;

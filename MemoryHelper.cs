@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace local_translate_provider;
+namespace TransLocal;
 
 /// <summary>
 /// 强制回收托管内存并归还工作集给系统，用于主窗口关闭后降低进程内存占用。

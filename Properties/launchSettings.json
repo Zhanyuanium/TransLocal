@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "local-translate-provider (Package)": {
+    "TransLocal (Package)": {
       "commandName": "MsixPackage"
     },
-    "local-translate-provider (Unpackaged)": {
+    "TransLocal (Unpackaged)": {
       "commandName": "Project"
     }
   }

@@ -1,4 +1,4 @@
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Normalizes language codes between DeepL (EN, DE) and Google (en, de) formats.

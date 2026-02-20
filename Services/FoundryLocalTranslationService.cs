@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using local_translate_provider;
-using local_translate_provider.Models;
+using TransLocal;
+using TransLocal.Models;
 using Microsoft.AI.Foundry.Local;
 using Microsoft.Extensions.Logging;
 using Betalgo.Ranul.OpenAI.ObjectModels.RequestModels;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>Foundry Local 翻译服务，支持多模型与运行策略。</summary>
 public sealed class FoundryLocalTranslationService : ITranslationService
@@ -189,7 +189,7 @@ public sealed class FoundryLocalTranslationService : ITranslationService
         {
             await FoundryLocalManager.CreateAsync(new Configuration
             {
-                AppName = "local-translate-provider",
+                AppName = "TransLocal",
                 LogLevel = Microsoft.AI.Foundry.Local.LogLevel.Information,
                 ModelCacheDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),

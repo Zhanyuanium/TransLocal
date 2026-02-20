@@ -1,6 +1,6 @@
-using local_translate_provider.Models;
+using TransLocal.Models;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Facade that routes translation requests to the configured backend (Phi Silica or Foundry Local).

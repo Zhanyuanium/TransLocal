@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Interface for translation services (Phi Silica, Foundry Local, etc.).

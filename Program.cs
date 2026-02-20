@@ -4,11 +4,11 @@ using System.Threading;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 
-namespace local_translate_provider;
+namespace TransLocal;
 
 public static class Program
 {
-    private const string SingleInstanceMutexName = "LocalTranslateProvider_SingleInstance";
+    private const string SingleInstanceMutexName = "TransLocal_SingleInstance";
 
     /// <summary>
     /// 启动参数，供 App 读取。Main 中设置后由 Application.Start 回调内的 App 使用。
@@ -18,7 +18,7 @@ public static class Program
     [DllImport("Microsoft.ui.xaml.dll")]
     private static extern void XamlCheckProcessRequirements();
 
-    private static readonly string DebugLogEnvVar = "LOCAL_TRANSLATE_PROVIDER_DEBUG_LOG";
+    private static readonly string DebugLogEnvVar = "TRANSLOCAL_DEBUG_LOG";
 
     [STAThread]
     public static void Main(string[] args)
@@ -79,7 +79,7 @@ public static class Program
 
     private static void SpawnTrayAndExit()
     {
-        var exe = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "local-translate-provider.exe";
+        var exe = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName ?? "TransLocal.exe";
         var startInfo = new ProcessStartInfo
         {
             FileName = exe,

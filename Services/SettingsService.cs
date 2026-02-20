@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Windows.Storage;
-using local_translate_provider.Models;
+using TransLocal.Models;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Persists and loads AppSettings using ApplicationData.

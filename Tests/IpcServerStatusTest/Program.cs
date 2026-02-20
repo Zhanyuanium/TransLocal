@@ -13,7 +13,7 @@ namespace IpcServerStatusTest;
 /// </summary>
 internal static class Program
 {
-    private static readonly string PipeName = "LocalTranslateProvider_IPC_" + Guid.NewGuid().ToString("N")[..8];
+    private static readonly string PipeName = "TransLocal_IPC_" + Guid.NewGuid().ToString("N")[..8];
 
     private static async Task<string> GetStatusAsync()
     {

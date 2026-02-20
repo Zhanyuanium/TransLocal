@@ -1,11 +1,11 @@
 using System.Text.Json;
-using local_translate_provider.Models;
+using TransLocal.Models;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// File-based settings storage for CLI when Windows App SDK is not initialized (unpackaged).
-/// Uses %LocalAppData%\local-translate-provider\settings.json.
+/// Uses %LocalAppData%\TransLocal\settings.json.
 /// </summary>
 public static class FileSettingsStorage
 {
@@ -18,7 +18,7 @@ public static class FileSettingsStorage
     private static string GetSettingsPath()
     {
         var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var dir = Path.Combine(baseDir, "local-translate-provider");
+        var dir = Path.Combine(baseDir, "TransLocal");
         Directory.CreateDirectory(dir);
         return Path.Combine(dir, "settings.json");
     }

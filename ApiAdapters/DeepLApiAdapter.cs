@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.Json;
-using local_translate_provider.Services;
+using TransLocal.Services;
 
-namespace local_translate_provider.ApiAdapters;
+namespace TransLocal.ApiAdapters;
 
 /// <summary>
 /// Handles DeepL-format translation requests and responses.

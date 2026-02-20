@@ -13,7 +13,7 @@ namespace IpcClientDeadlockTest;
 /// </summary>
 internal static class Program
 {
-    private const string PipeName = "LocalTranslateProvider_IPC_Test_Nonexistent";
+    private const string PipeName = "TransLocal_IPC_Test_Nonexistent";
 
     private static async Task<(bool Success, string? Response)> SendAsyncWithConfigureAwait(string command)
     {

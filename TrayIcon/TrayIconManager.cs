@@ -3,7 +3,7 @@ using H.NotifyIcon;
 using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel.Resources;
 
-namespace local_translate_provider.TrayIcon;
+namespace TransLocal.TrayIcon;
 
 /// <summary>
 /// Manages the system tray icon, double-click to show settings, and context menu.

@@ -1,4 +1,4 @@
-using local_translate_provider.Pages;
+using TransLocal.Pages;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Windows.ApplicationModel.Resources;
 using Windows.Graphics;
 
-namespace local_translate_provider;
+namespace TransLocal;
 
 public sealed partial class MainWindow : Window
 {

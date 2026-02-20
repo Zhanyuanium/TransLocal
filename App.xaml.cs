@@ -1,13 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
-using local_translate_provider.Models;
-using local_translate_provider.Services;
-using local_translate_provider.TrayIcon;
+using TransLocal.Models;
+using TransLocal.Services;
+using TransLocal.TrayIcon;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Windows.ApplicationModel.Resources;
 
-namespace local_translate_provider;
+namespace TransLocal;
 
 public partial class App : Application
 {

@@ -1,4 +1,4 @@
-# Local Translate Provider
+# TransLocal
 
 本地翻译服务，提供 DeepL / Google Translate 兼容的 HTTP 接口，支持 Phi Silica 与 Foundry Local 两种后端，可在 Windows 上以托盘形式后台运行。
 
@@ -30,28 +30,28 @@ dotnet build -p:Platform=x64
 
 **方式一：MSIX 打包（推荐）**
 
-在 Visual Studio 中选择 `local-translate-provider (Package)` 配置，生成并部署。安装后可通过开始菜单或 `local-translate-provider` 命令启动。
+在 Visual Studio 中选择 `TransLocal (Package)` 配置，生成并部署。安装后可通过开始菜单或 `TransLocal` 命令启动。
 
 **方式二：直接运行**
 
 ```powershell
 # 启动托盘（后台运行）
-.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\local-translate-provider.exe
+.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\TransLocal.exe
 
 # 或指定 --tray
-.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\local-translate-provider.exe --tray
+.\bin\x64\Debug\net8.0-windows10.0.26100.0\win-x64\TransLocal.exe --tray
 ```
 
 ## 命令行用法
 
 ```
-local-translate-provider            启动托盘并退出
-local-translate-provider gui        打开主窗口（或启动新实例）
-local-translate-provider quit       退出已运行的托盘
-local-translate-provider status     显示翻译后端状态
-local-translate-provider about      显示应用信息
-local-translate-provider config     修改设置（见 config --help）
-local-translate-provider --help     显示帮助
+TransLocal            启动托盘并退出
+TransLocal gui        打开主窗口（或启动新实例）
+TransLocal quit       退出已运行的托盘
+TransLocal status     显示翻译后端状态
+TransLocal about      显示应用信息
+TransLocal config     修改设置（见 config --help）
+TransLocal --help     显示帮助
 ```
 
 ### config 子命令
@@ -122,7 +122,7 @@ GET http://localhost:52860/translate_a/single?q=Hello&sl=en&tl=zh
 默认关闭。启用方式：
 
 - 主窗口 → 关于 → 启用 IPC 调试日志
-- 环境变量 `LOCAL_TRANSLATE_PROVIDER_DEBUG_LOG=1`
+- 环境变量 `TRANSLOCAL_DEBUG_LOG=1`
 - CLI 参数 `--debug-log`
 
 详见 [DEBUG_LOG_README.md](DEBUG_LOG_README.md)。
@@ -130,7 +130,7 @@ GET http://localhost:52860/translate_a/single?q=Hello&sl=en&tl=zh
 ## 项目结构
 
 ```
-local-translate-provider/
+TransLocal/
 ├── ApiAdapters/          # DeepL / Google API 请求解析
 ├── Models/               # AppSettings 等
 ├── Pages/                # 主窗口设置页（通用 / 模型 / 服务 / 关于）

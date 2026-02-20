@@ -1,4 +1,4 @@
-namespace local_translate_provider.Models;
+namespace TransLocal.Models;
 
 /// <summary>
 /// Application settings for the translation provider.

@@ -2,16 +2,16 @@ using System.IO;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading.Tasks;
-using local_translate_provider;
+using TransLocal;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Named Pipe 客户端，用于 CLI 向已运行的托盘实例发送命令。
 /// </summary>
 public static class IpcClient
 {
-    private const string PipeName = "LocalTranslateProvider_IPC";
+    private const string PipeName = "TransLocal_IPC";
 
     public static async Task<(bool Success, string? Response)> SendAsync(string command)
     {

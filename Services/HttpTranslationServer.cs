@@ -7,11 +7,11 @@ using System.Security.Authentication;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using local_translate_provider.ApiAdapters;
-using local_translate_provider.Models;
-using local_translate_provider.Services;
+using TransLocal.ApiAdapters;
+using TransLocal.Models;
+using TransLocal.Services;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// HTTP server that exposes DeepL and Google Translate format endpoints.

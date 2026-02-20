@@ -1,22 +1,22 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace local_translate_provider.Services;
+namespace TransLocal.Services;
 
 /// <summary>
 /// Manages CA and server certificates for the API proxy.
-/// CA is stored in %LocalAppData%\local-translate-provider\.
+/// CA is stored in %LocalAppData%\TransLocal\.
 /// </summary>
 public sealed class CertificateManager
 {
     private const string CaFileName = "ca.pfx";
-    private const string CaSubject = "CN=Local Translate Provider CA";
-    private const string CaPassword = "local-translate-provider-ca";
+    private const string CaSubject = "CN=TransLocal CA";
+    private const string CaPassword = "TransLocal-ca";
 
     private static string CertDirectory =>
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "local-translate-provider");
+            "TransLocal");
 
     private static string CaPath => Path.Combine(CertDirectory, CaFileName);
 
